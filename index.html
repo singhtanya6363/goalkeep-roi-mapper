@@ -8,9 +8,9 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --ink: #1a1a18; --ink-muted: #6b6b62; --ink-faint: #a8a89e;
-  --surface: #faf9f6; --surface-2: #f2f0eb; --surface-3: #e8e5de;
-  --border: rgba(26,26,24,0.1); --border-strong: rgba(26,26,24,0.2);
+  --ink:#1a1a18; --ink-muted:#6b6b62; --ink-faint:#a8a89e;
+  --surface:#faf9f6; --surface-2:#f2f0eb; --surface-3:#e8e5de;
+  --border:rgba(26,26,24,0.1); --border-strong:rgba(26,26,24,0.2);
   --blue-bg:#eaf2fc; --blue-text:#1a5fa8; --blue-border:#b5d0f0;
   --green-bg:#eaf4e2; --green-text:#2d6b12; --green-border:#b8d99a;
   --amber-bg:#fdf0d8; --amber-text:#8a4e08; --amber-border:#f5c97a;
@@ -20,28 +20,23 @@
 html { font-size:16px; }
 body { font-family:'DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; font-weight:400; line-height:1.6; }
 
-header { border-bottom:1px solid var(--border); padding:1rem 2rem; display:flex; align-items:center; gap:10px; background:var(--surface); position:sticky; top:0; z-index:100; }
-.logo-mark { width:32px; height:32px; background:var(--ink); border-radius:8px; display:flex; align-items:center; justify-content:center; }
-.logo-mark svg { width:18px; height:18px; fill:var(--surface); }
-.logo-text { font-family:'DM Serif Display',serif; font-size:18px; color:var(--ink); }
-.logo-sep { color:var(--ink-faint); margin:0 4px; }
-.logo-sub { font-size:13px; color:var(--ink-muted); font-weight:300; }
+header { border-bottom:1px solid var(--border); padding:0.85rem 2rem; display:flex; align-items:center; gap:14px; background:var(--surface); position:sticky; top:0; z-index:100; }
+.gk-logo { height:26px; width:auto; display:block; }
+.header-sep { width:1px; height:20px; background:var(--border-strong); }
+.header-title { font-size:13px; color:var(--ink-muted); font-weight:400; }
 
-/* Steps indicator */
-.steps { display:flex; align-items:center; justify-content:center; gap:0; padding:1.5rem 1rem 0; max-width:460px; margin:0 auto; }
+.steps { display:flex; align-items:center; justify-content:center; padding:1.5rem 1rem 0; max-width:460px; margin:0 auto; }
 .step { display:flex; align-items:center; gap:8px; }
 .step-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; border:1.5px solid var(--border-strong); color:var(--ink-faint); background:white; transition:all 0.3s; flex-shrink:0; }
-.step-num.active { border-color:var(--ink); color:var(--ink); background:white; }
+.step-num.active { border-color:var(--ink); color:var(--ink); }
 .step-num.done { border-color:var(--ink); background:var(--ink); color:var(--surface); }
 .step-label { font-size:12px; color:var(--ink-faint); transition:color 0.3s; white-space:nowrap; }
 .step-label.active { color:var(--ink); font-weight:500; }
 .step-line { width:40px; height:1px; background:var(--border-strong); margin:0 8px; flex-shrink:0; }
 
-/* Screen */
 .screen { display:none; animation:fadeUp 0.35s ease both; }
 .screen.active { display:block; }
 
-/* Hero */
 .hero { max-width:640px; margin:0 auto; padding:2rem 1.5rem 1.5rem; text-align:center; }
 .hero-eyebrow { font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-bottom:0.85rem; display:flex; align-items:center; justify-content:center; gap:8px; }
 .hero-eyebrow::before,.hero-eyebrow::after { content:''; width:28px; height:1px; background:var(--border-strong); display:block; }
@@ -49,7 +44,6 @@ h1 { font-family:'DM Serif Display',serif; font-size:clamp(24px,4vw,36px); line-
 h1 em { font-style:italic; color:var(--blue-text); }
 .hero-sub { font-size:14px; color:var(--ink-muted); font-weight:300; max-width:440px; margin:0 auto; line-height:1.7; }
 
-/* Info fields */
 .info-fields { max-width:500px; margin:1.5rem auto 0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .field-wrap { display:flex; flex-direction:column; gap:5px; }
 .field-wrap label { font-size:11px; font-weight:500; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.06em; }
@@ -58,12 +52,9 @@ h1 em { font-style:italic; color:var(--blue-text); }
 .field-wrap input::placeholder { color:var(--ink-faint); }
 .field-full { grid-column:1/-1; }
 
-/* Main */
 main { max-width:700px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
 
-/* ROI cards */
-.roi-section { margin-bottom:10px; animation:fadeUp 0.4s ease both; }
-.roi-section:nth-child(1){animation-delay:.05s} .roi-section:nth-child(2){animation-delay:.1s} .roi-section:nth-child(3){animation-delay:.15s} .roi-section:nth-child(4){animation-delay:.2s}
+.roi-section { margin-bottom:10px; }
 .roi-header { display:flex; align-items:center; gap:12px; padding:1rem 1.25rem; background:white; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:border-color 0.2s,background 0.2s; user-select:none; }
 .roi-header:hover { border-color:var(--border-strong); background:var(--surface-2); }
 .roi-header.open { border-radius:var(--radius) var(--radius) 0 0; border-bottom-color:transparent; }
@@ -78,8 +69,8 @@ main { max-width:700px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
 .roi-chevron svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .roi-body { display:none; padding:1rem 1.25rem 1.25rem; background:white; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); }
 .roi-body.open { display:block; }
-.opts-grid { display:flex; flex-wrap:wrap; gap:7px; }
-.opt { font-size:13px; padding:6px 14px; border-radius:20px; border:1px solid var(--border-strong); background:var(--surface-2); color:var(--ink-muted); cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
+.opts-grid { display:flex; flex-wrap:wrap; gap:8px; }
+.opt { font-size:13px; padding:7px 14px; border-radius:20px; border:1px solid var(--border-strong); background:var(--surface-2); color:var(--ink-muted); cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
 .opt:hover { border-color:var(--ink-faint); color:var(--ink); background:var(--surface-3); }
 .opt.sel-financial { background:var(--blue-bg); color:var(--blue-text); border-color:var(--blue-border); font-weight:500; }
 .opt.sel-efficiency { background:var(--green-bg); color:var(--green-text); border-color:var(--green-border); font-weight:500; }
@@ -89,9 +80,8 @@ main { max-width:700px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
 .badge-efficiency{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
 .badge-decision{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
 .badge-capacity{background:var(--purple-bg);color:var(--purple-text);border:1px solid var(--purple-border)}
-.icon-financial{background:var(--blue-bg);color:var(--blue-text)} .icon-efficiency{background:var(--green-bg);color:var(--green-text)} .icon-decision{background:var(--amber-bg);color:var(--amber-text)} .icon-capacity{background:var(--purple-bg);color:var(--purple-text)}
+.icon-financial{background:var(--blue-bg)} .icon-efficiency{background:var(--green-bg)} .icon-decision{background:var(--amber-bg)} .icon-capacity{background:var(--purple-bg)}
 
-/* Summary bar */
 .summary { display:none; margin-top:1.5rem; border:1px solid var(--border); border-radius:var(--radius); background:white; overflow:hidden; }
 .summary.visible { display:block; }
 .summary-header { padding:0.9rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
@@ -101,38 +91,41 @@ main { max-width:700px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
 .summary-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1rem; }
 .summary-chip { font-size:12px; padding:4px 11px; border-radius:20px; }
 
-/* Baseline screen */
 .baseline-hero { max-width:640px; margin:0 auto; padding:2rem 1.5rem 1.5rem; text-align:center; }
 .baseline-hero h1 { font-size:clamp(22px,3.5vw,32px); }
+
+.survey-type-wrap { max-width:320px; margin:1rem auto 0; display:flex; gap:8px; }
+.survey-type-btn { flex:1; padding:10px 14px; border:1.5px solid var(--border-strong); border-radius:var(--radius-sm); background:white; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--ink-muted); cursor:pointer; transition:all 0.15s; }
+.survey-type-btn:hover { border-color:var(--ink); color:var(--ink); }
+.survey-type-btn.active { border-color:var(--ink); background:var(--ink); color:white; }
+.survey-type-hint { font-size:11px; color:var(--ink-faint); text-align:center; margin-top:6px; max-width:360px; margin-left:auto; margin-right:auto; }
+
 .baseline-section { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:10px; }
 .baseline-section-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--border); }
-.baseline-section-title { font-size:14px; font-weight:500; color:var(--ink); }
+.baseline-section-title { font-size:14px; font-weight:500; color:var(--ink); flex:1; }
+.survey-type-tag { font-size:10px; padding:2px 8px; border-radius:20px; font-weight:500; }
+.tag-baseline { background:var(--blue-bg); color:var(--blue-text); border:1px solid var(--blue-border); }
+.tag-endline { background:var(--green-bg); color:var(--green-text); border:1px solid var(--green-border); }
 .baseline-q { margin-bottom:1.1rem; }
 .baseline-q:last-child { margin-bottom:0; }
 .baseline-q-label { font-size:13px; color:var(--ink); margin-bottom:8px; line-height:1.5; }
 .baseline-q-label span { font-size:11px; color:var(--ink-faint); font-weight:300; margin-left:6px; }
-/* Rating */
-.rating-row { display:flex; gap:6px; flex-wrap:wrap; }
+.rating-row { display:flex; gap:6px; }
 .rating-btn { width:40px; height:40px; border-radius:var(--radius-sm); border:1px solid var(--border-strong); background:var(--surface-2); color:var(--ink-muted); font-size:13px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
 .rating-btn:hover { border-color:var(--ink-faint); color:var(--ink); }
 .rating-btn.sel { background:var(--ink); color:var(--surface); border-color:var(--ink); }
 .rating-labels { display:flex; justify-content:space-between; font-size:11px; color:var(--ink-faint); margin-top:4px; max-width:236px; }
-/* Select */
 .base-select { width:100%; border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); background:white; outline:none; appearance:none; cursor:pointer; }
-/* Textarea */
 .base-textarea { width:100%; border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); background:white; outline:none; resize:vertical; min-height:72px; line-height:1.5; }
-.base-select:focus, .base-textarea:focus { border-color:var(--ink); }
+.base-select:focus,.base-textarea:focus { border-color:var(--ink); }
 
-/* Buttons */
 .btn-row { display:flex; gap:10px; margin-top:1.5rem; }
-.btn-primary { flex:1; padding:12px 20px; background:var(--ink); color:var(--surface); border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:background 0.15s,transform 0.1s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-primary { flex:1; padding:12px 20px; background:var(--ink); color:var(--surface); border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:background 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; }
 .btn-primary:hover { background:#333330; }
-.btn-primary:active { transform:scale(0.99); }
 .btn-primary svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
 .btn-secondary { padding:12px 20px; background:transparent; border:1px solid var(--border-strong); border-radius:var(--radius-sm); font-size:14px; font-family:'DM Sans',sans-serif; color:var(--ink-muted); cursor:pointer; transition:all 0.15s; }
 .btn-secondary:hover { border-color:var(--ink); color:var(--ink); }
 
-/* Confirmation */
 .conf-wrap { text-align:center; padding:3rem 1.5rem; }
 .conf-icon { width:60px; height:60px; background:var(--green-bg); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:26px; }
 .conf-wrap h2 { font-family:'DM Serif Display',serif; font-size:26px; color:var(--ink); margin-bottom:0.5rem; }
@@ -140,28 +133,21 @@ main { max-width:700px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
 .btn-reset { padding:8px 20px; background:transparent; border:1px solid var(--border-strong); border-radius:var(--radius-sm); font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink-muted); cursor:pointer; transition:all 0.15s; }
 .btn-reset:hover { border-color:var(--ink); color:var(--ink); }
 
-footer { text-align:center; padding:1.5rem; font-size:12px; color:var(--ink-faint); border-top:1px solid var(--border); }
+footer { text-align:center; padding:1.5rem; font-size:12px; color:var(--ink-faint); border-top:1px solid var(--border); margin-top:2rem; }
 footer a { color:var(--ink-muted); text-decoration:none; }
-footer a:hover { color:var(--ink); }
-
 @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-@media(max-width:520px){
-  header{padding:1rem} .info-fields{grid-template-columns:1fr} .logo-sub{display:none}
-  main{padding:1rem 1rem 3rem} .baseline-hero{padding:1.5rem 1rem 1rem}
-}
+@media(max-width:520px){ header{padding:0.85rem 1rem} .info-fields{grid-template-columns:1fr} main{padding:1rem 1rem 3rem} }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L4 7v10l8 5 8-5V7L12 2z"/></svg></div>
-  <span class="logo-text">goalkeep</span>
-  <span class="logo-sep">·</span>
-  <span class="logo-sub">ROI Expectation Mapper</span>
+  <img class="gk-logo" src="data:image/png;base64,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" alt="Goalkeep" />
+  <div class="header-sep"></div>
+  <span class="header-title">ROI Expectation Mapper</span>
 </header>
 
-<!-- STEP INDICATOR -->
-<div class="steps" id="steps-bar">
+<div class="steps">
   <div class="step">
     <div class="step-num active" id="sn1">1</div>
     <span class="step-label active" id="sl1">Expectations</span>
@@ -169,7 +155,7 @@ footer a:hover { color:var(--ink); }
   <div class="step-line"></div>
   <div class="step">
     <div class="step-num" id="sn2">2</div>
-    <span class="step-label" id="sl2">Baseline</span>
+    <span class="step-label" id="sl2">Baseline / Endline</span>
   </div>
   <div class="step-line"></div>
   <div class="step">
@@ -178,12 +164,12 @@ footer a:hover { color:var(--ink); }
   </div>
 </div>
 
-<!-- SCREEN 1: ROI SELECTOR -->
+<!-- SCREEN 1 -->
 <div class="screen active" id="screen1">
   <div class="hero">
     <div class="hero-eyebrow">Step 1 of 2</div>
     <h1>What do you expect<br>will <em>change</em> after<br>this engagement?</h1>
-    <p class="hero-sub">Select the outcomes that matter most to your organisation.</p>
+    <p class="hero-sub">Select the metrics that matter most to your organisation.</p>
     <div class="info-fields">
       <div class="field-wrap">
         <label for="org-name">Organisation</label>
@@ -201,7 +187,7 @@ footer a:hover { color:var(--ink); }
   </div>
 
   <main>
-    <!-- Financial -->
+    <!-- FINANCIAL -->
     <div class="roi-section">
       <div class="roi-header" onclick="toggleSection('financial')">
         <div class="roi-icon icon-financial">💰</div>
@@ -214,17 +200,15 @@ footer a:hover { color:var(--ink); }
       </div>
       <div class="roi-body" id="body-financial">
         <div class="opts-grid" id="opts-financial">
-          <span class="opt" onclick="toggleOpt(this,'financial')">Access new grants or funding</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Strengthen donor reporting</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Justify budget to leadership or board</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Reduce dependence on external consultants</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Save staff time (translates to cost)</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Improve CSR proposal quality</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Better track program spend vs. outcomes</span>
+          <span class="opt" onclick="toggleOpt(this,'financial')">Funding raised where Goalkeep outputs were used</span>
+          <span class="opt" onclick="toggleOpt(this,'financial')">Budget growth associated with Goalkeep's work</span>
+          <span class="opt" onclick="toggleOpt(this,'financial')">Cost saved by reducing external dependency</span>
+          <span class="opt" onclick="toggleOpt(this,'financial')">Cost saved through automation / time reduction</span>
         </div>
       </div>
     </div>
-    <!-- Efficiency -->
+
+    <!-- EFFICIENCY -->
     <div class="roi-section">
       <div class="roi-header" onclick="toggleSection('efficiency')">
         <div class="roi-icon icon-efficiency">⚡</div>
@@ -237,17 +221,15 @@ footer a:hover { color:var(--ink); }
       </div>
       <div class="roi-body" id="body-efficiency">
         <div class="opts-grid" id="opts-efficiency">
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Reduce manual data entry or cleaning</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Fewer ad-hoc requests to MEL team</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Faster monthly or quarterly reporting</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Consolidate multiple trackers into one system</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Easier data entry for field staff</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Less time preparing data for reviews</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Dashboards accessible without technical help</span>
+          <span class="opt" onclick="toggleOpt(this,'efficiency')">Reduction in manual data requests</span>
+          <span class="opt" onclick="toggleOpt(this,'efficiency')">Time saved in reporting</span>
+          <span class="opt" onclick="toggleOpt(this,'efficiency')">Reduction in duplicate trackers</span>
+          <span class="opt" onclick="toggleOpt(this,'efficiency')">Faster access to data</span>
         </div>
       </div>
     </div>
-    <!-- Decision -->
+
+    <!-- DECISION -->
     <div class="roi-section">
       <div class="roi-header" onclick="toggleSection('decision')">
         <div class="roi-icon icon-decision">🧭</div>
@@ -260,17 +242,15 @@ footer a:hover { color:var(--ink); }
       </div>
       <div class="roi-body" id="body-decision">
         <div class="opts-grid" id="opts-decision">
-          <span class="opt" onclick="toggleOpt(this,'decision')">Use data in program review meetings</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Course-correct programs using real-time data</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Set and track targets more reliably</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Improve reporting to leadership or board</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Communicate impact to funders more clearly</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Prioritise geographies, beneficiaries, or activities</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Strengthen Theory of Change with evidence</span>
+          <span class="opt" onclick="toggleOpt(this,'decision')">Number of decisions influenced by dashboard / data</span>
+          <span class="opt" onclick="toggleOpt(this,'decision')">Improvement in program indicators linked to data use</span>
+          <span class="opt" onclick="toggleOpt(this,'decision')">Better target planning</span>
+          <span class="opt" onclick="toggleOpt(this,'decision')">Improved donor / leadership communication</span>
         </div>
       </div>
     </div>
-    <!-- Capacity -->
+
+    <!-- CAPACITY -->
     <div class="roi-section">
       <div class="roi-header" onclick="toggleSection('capacity')">
         <div class="roi-icon icon-capacity">🌱</div>
@@ -283,18 +263,15 @@ footer a:hover { color:var(--ink); }
       </div>
       <div class="roi-body" id="body-capacity">
         <div class="opts-grid" id="opts-capacity">
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Build team confidence with data</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Train staff on data collection or analysis</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Reduce dependence on one person for data work</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Sustain data systems after engagement ends</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Improve data hygiene and collection quality</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Create internal champions for data use</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Shift team mindset from reporting to learning</span>
+          <span class="opt" onclick="toggleOpt(this,'capacity')">Staff trained</span>
+          <span class="opt" onclick="toggleOpt(this,'capacity')">Improvement in pre / post assessment scores</span>
+          <span class="opt" onclick="toggleOpt(this,'capacity')">Continued use of training materials</span>
+          <span class="opt" onclick="toggleOpt(this,'capacity')">Internal replication of Goalkeep methods</span>
+          <span class="opt" onclick="toggleOpt(this,'capacity')">Dashboard adoption</span>
         </div>
       </div>
     </div>
 
-    <!-- Summary -->
     <div class="summary" id="summary">
       <div class="summary-header">
         <span class="summary-header-title">
@@ -306,7 +283,7 @@ footer a:hover { color:var(--ink); }
       <div class="summary-body">
         <div class="summary-chips" id="summary-chips"></div>
         <button class="btn-primary" onclick="goToBaseline()">
-          Next: baseline questions
+          Next: baseline / endline questions
           <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </button>
       </div>
@@ -314,12 +291,17 @@ footer a:hover { color:var(--ink); }
   </main>
 </div>
 
-<!-- SCREEN 2: BASELINE -->
+<!-- SCREEN 2 -->
 <div class="screen" id="screen2">
   <div class="baseline-hero">
     <div class="hero-eyebrow">Step 2 of 2</div>
-    <h1>A few <em>baseline</em><br>questions</h1>
-    <p class="hero-sub">These help Goalkeep understand where you are today, so we can measure what changes.</p>
+    <h1>A few <em>data</em><br>questions</h1>
+    <p class="hero-sub">Are you filling this at the start of the engagement or six months after?</p>
+    <div class="survey-type-wrap">
+      <button class="survey-type-btn active" id="btn-baseline" onclick="setSurveyType('baseline')">📋 Baseline</button>
+      <button class="survey-type-btn" id="btn-endline" onclick="setSurveyType('endline')">📊 Endline</button>
+    </div>
+    <p class="survey-type-hint" id="survey-type-hint">Baseline: fill at the start — captures your current situation before Goalkeep's work begins.</p>
   </div>
   <main>
     <div id="baseline-sections"></div>
@@ -333,13 +315,13 @@ footer a:hover { color:var(--ink); }
   </main>
 </div>
 
-<!-- SCREEN 3: CONFIRMATION -->
+<!-- SCREEN 3 -->
 <div class="screen" id="screen3">
   <main>
     <div class="conf-wrap">
       <div class="conf-icon">✓</div>
       <h2>Thank you</h2>
-      <p id="conf-msg">Your responses have been recorded. The Goalkeep team will use these to shape the engagement and set up baseline tracking.</p>
+      <p id="conf-msg">Your responses have been recorded.</p>
       <button class="btn-reset" onclick="resetAll()">Start over</button>
     </div>
   </main>
@@ -350,10 +332,10 @@ footer a:hover { color:var(--ink); }
 </footer>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxYGH-5gzxSjoVx_pFrAGbYtPX1aQHmr1pToUzccFOz-DpzGdL43ABeJ_tf_wK4o7VyIA/exec';
-
+const SHEET_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
 const selected = { financial:new Set(), efficiency:new Set(), decision:new Set(), capacity:new Set() };
 const openSec = { financial:false, efficiency:false, decision:false, capacity:false };
+let surveyType = 'baseline';
 
 const chipColors = {
   financial:'background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)',
@@ -362,41 +344,76 @@ const chipColors = {
   capacity:'background:var(--purple-bg);color:var(--purple-text);border:1px solid var(--purple-border)'
 };
 
-const baselineQuestions = {
+const questions = {
   financial: {
     icon:'💰', title:'Financial ROI',
-    questions:[
-      { id:'fin_current_funding', label:'How does your organisation currently communicate impact to funders?', type:'textarea' },
-      { id:'fin_consultant_spend', label:'Do you currently rely on external consultants for data or reporting work?', type:'select', options:['Yes, heavily','Yes, occasionally','No'] },
-      { id:'fin_funding_confidence', label:'How confident is your team in presenting data to donors or funders?', type:'rating' }
+    baseline:[
+      { id:'fin_funding_use_bl', label:'Are Goalkeep outputs (reports, dashboards, ToC) currently used in donor conversations or proposals?', type:'select', options:['Not yet','Sometimes','Regularly'] },
+      { id:'fin_consultant_dep_bl', label:'Does your org currently rely on external consultants for data or reporting work?', type:'select', options:['Yes, heavily','Yes, occasionally','No'] },
+      { id:'fin_donor_confidence_bl', label:'How confident is your team presenting data to donors today?', type:'rating' }
+    ],
+    endline:[
+      { id:'fin_funding_raised_el', label:'Has any funding been raised where Goalkeep outputs directly supported the proposal or conversation?', type:'select', options:['Yes — confirmed amount','Yes — approximate','Not confirmed yet','No'] },
+      { id:'fin_consultant_change_el', label:'Has dependence on external consultants for data work changed?', type:'select', options:['Significantly reduced','Somewhat reduced','No change','Increased'] },
+      { id:'fin_donor_confidence_el', label:'How confident is your team presenting data to donors now?', type:'rating' }
     ]
   },
   efficiency: {
     icon:'⚡', title:'Efficiency ROI',
-    questions:[
-      { id:'eff_reporting_time', label:'How many hours roughly does your team spend on monthly reporting?', type:'select', options:['Less than 5 hrs','5–10 hrs','10–20 hrs','20+ hrs'] },
-      { id:'eff_manual_work', label:'What manual data work takes the most time currently?', type:'textarea' },
-      { id:'eff_data_access', label:'How easy is it for staff to access the data they need?', type:'rating' }
+    baseline:[
+      { id:'eff_requests_bl', label:'How many manual data or report requests does your MEL team receive per month?', type:'select', options:['0–10','10–30','30–80','80–200','200+'] },
+      { id:'eff_report_time_bl', label:'How many hours does your team spend preparing a monthly / quarterly report?', type:'select', options:['Under 5 hrs','5–10 hrs','10–20 hrs','20+ hrs'] },
+      { id:'eff_trackers_bl', label:'How many separate data trackers or spreadsheets does your team maintain?', type:'select', options:['1–3','4–8','9–15','15+'] },
+      { id:'eff_data_access_bl', label:'How easy is it for staff to access the data they need without asking someone?', type:'rating' }
+    ],
+    endline:[
+      { id:'eff_requests_el', label:'How many manual data or report requests does your MEL team receive per month now?', type:'select', options:['0–10','10–30','30–80','80–200','200+'] },
+      { id:'eff_report_time_el', label:'How many hours does your team now spend preparing a monthly / quarterly report?', type:'select', options:['Under 5 hrs','5–10 hrs','10–20 hrs','20+ hrs'] },
+      { id:'eff_trackers_el', label:'How many separate data trackers or spreadsheets does your team maintain now?', type:'select', options:['1–3','4–8','9–15','15+'] },
+      { id:'eff_data_access_el', label:'How easy is it now for staff to access data without asking someone?', type:'rating' }
     ]
   },
   decision: {
     icon:'🧭', title:'Decision-making ROI',
-    questions:[
-      { id:'dec_data_use', label:'How often does your team use data in program review or planning meetings?', type:'select', options:['Rarely or never','Sometimes','Most of the time','Always'] },
-      { id:'dec_decisions', label:'Can you share an example of a recent decision that data helped inform?', type:'textarea' },
-      { id:'dec_confidence', label:'How confident is your leadership in using data to make decisions?', type:'rating' }
+    baseline:[
+      { id:'dec_decisions_bl', label:'How many data-driven decisions does your team make per month (program reviews, target changes, strategy shifts)?', type:'select', options:['0–2','3–6','7–12','12+'] },
+      { id:'dec_reviews_bl', label:'How often does your team use data in program review or planning meetings?', type:'select', options:['Rarely or never','Sometimes','Most of the time','Always'] },
+      { id:'dec_reports_bl', label:'How many reports or decks per quarter use Goalkeep-supported data?', type:'select', options:['0','1–2','3–5','5+'] },
+      { id:'dec_confidence_bl', label:'How confident is leadership in using data to make decisions today?', type:'rating' }
+    ],
+    endline:[
+      { id:'dec_decisions_el', label:'How many data-driven decisions does your team make per month now?', type:'select', options:['0–2','3–6','7–12','12+'] },
+      { id:'dec_reviews_el', label:'How often does your team now use data in program review or planning meetings?', type:'select', options:['Rarely or never','Sometimes','Most of the time','Always'] },
+      { id:'dec_reports_el', label:'How many reports or decks per quarter now use Goalkeep-supported data?', type:'select', options:['0','1–2','3–5','5+'] },
+      { id:'dec_confidence_el', label:'How confident is leadership in using data to make decisions now?', type:'rating' }
     ]
   },
   capacity: {
     icon:'🌱', title:'Capacity & data culture',
-    questions:[
-      { id:'cap_comfort', label:'How comfortable does your team feel working with data today?', type:'rating' },
-      { id:'cap_dependency', label:'Is there one person everyone goes to for data questions, or is it more distributed?', type:'select', options:['One person handles everything','A small group of 2–3','Fairly distributed across team'] },
-      { id:'cap_training', label:'Has the team received data training before? If yes, what stuck and what did not?', type:'textarea' },
-      { id:'cap_staff_count', label:'How many staff will be involved in this engagement?', type:'select', options:['1–5','6–15','16–30','30+'] }
+    baseline:[
+      { id:'cap_staff_count_bl', label:'How many staff will be involved in this engagement?', type:'select', options:['1–5','6–15','16–30','30+'] },
+      { id:'cap_comfort_bl', label:'How comfortable does your team feel working with data today?', type:'rating' },
+      { id:'cap_dep_bl', label:'Is data responsibility concentrated in one person or distributed across the team?', type:'select', options:['One person handles everything','A small group of 2–3','Fairly distributed'] },
+      { id:'cap_training_bl', label:'Has the team received data training before? Briefly describe what was covered.', type:'textarea' }
+    ],
+    endline:[
+      { id:'cap_comfort_el', label:'How comfortable does your team feel working with data now?', type:'rating' },
+      { id:'cap_score_change_el', label:'Did participants show improvement in pre/post assessment scores?', type:'select', options:['Yes — significant improvement','Yes — some improvement','No change','No assessment run'] },
+      { id:'cap_systems_used_el', label:'Are Goalkeep-built dashboards or systems still actively used?', type:'select', options:['Yes, regularly','Occasionally','Rarely','Not at all'] },
+      { id:'cap_replication_el', label:'Has the team independently replicated or adapted any Goalkeep methods or templates?', type:'textarea' }
     ]
   }
 };
+
+function setSurveyType(type) {
+  surveyType = type;
+  document.getElementById('btn-baseline').classList.toggle('active', type==='baseline');
+  document.getElementById('btn-endline').classList.toggle('active', type==='endline');
+  document.getElementById('survey-type-hint').textContent = type==='baseline'
+    ? 'Baseline: fill at the start — captures your current situation before Goalkeep\'s work begins.'
+    : 'Endline: fill ~6 months after the engagement — captures what changed and what Goalkeep contributed.';
+  if (document.getElementById('baseline-sections').children.length > 0) buildBaseline();
+}
 
 function toggleSection(key) {
   openSec[key] = !openSec[key];
@@ -415,137 +432,137 @@ function toggleOpt(el, key) {
 function updateBadge(key) {
   const badge = document.getElementById('badge-'+key);
   const n = selected[key].size;
-  if (n > 0) { badge.textContent = n+' selected'; badge.classList.add('visible'); }
-  else { badge.classList.remove('visible'); }
+  if (n>0){badge.textContent=n+' selected';badge.classList.add('visible');}
+  else{badge.classList.remove('visible');}
 }
 
 function updateSummary() {
-  const all = [];
-  for (const [key,set] of Object.entries(selected)) for (const item of set) all.push({text:item,key});
-  const summary = document.getElementById('summary');
-  if (!all.length) { summary.classList.remove('visible'); return; }
+  const all=[];
+  for(const[key,set]of Object.entries(selected))for(const item of set)all.push({text:item,key});
+  const summary=document.getElementById('summary');
+  if(!all.length){summary.classList.remove('visible');return;}
   summary.classList.add('visible');
-  document.getElementById('summary-count').textContent = all.length+' item'+(all.length!==1?'s':'');
-  document.getElementById('summary-chips').innerHTML = all.map(({text,key})=>`<span class="summary-chip" style="${chipColors[key]}">${text}</span>`).join('');
+  document.getElementById('summary-count').textContent=all.length+' item'+(all.length!==1?'s':'');
+  document.getElementById('summary-chips').innerHTML=all.map(({text,key})=>`<span class="summary-chip" style="${chipColors[key]}">${text}</span>`).join('');
 }
 
 function goToBaseline() {
-  const all = Object.values(selected).flatMap(s=>Array.from(s));
-  if (!all.length) { alert('Please select at least one expectation.'); return; }
+  const all=Object.values(selected).flatMap(s=>Array.from(s));
+  if(!all.length){alert('Please select at least one metric.');return;}
   buildBaseline();
   showScreen(2);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function goBack() { showScreen(1); window.scrollTo({top:0,behavior:'smooth'}); }
+function goBack(){showScreen(1);window.scrollTo({top:0,behavior:'smooth'});}
 
 function buildBaseline() {
-  const container = document.getElementById('baseline-sections');
-  container.innerHTML = '';
-  for (const [key, data] of Object.entries(baselineQuestions)) {
-    if (!selected[key].size) continue;
-    const sec = document.createElement('div');
-    sec.className = 'baseline-section';
-    let html = `<div class="baseline-section-header">
-      <div class="roi-icon icon-${key}" style="width:32px;height:32px;font-size:15px;">${data.icon}</div>
+  const container=document.getElementById('baseline-sections');
+  container.innerHTML='';
+  const qKey=surveyType;
+  const tagClass=surveyType==='baseline'?'tag-baseline':'tag-endline';
+  const tagLabel=surveyType==='baseline'?'Baseline':'Endline';
+  for(const[key,data]of Object.entries(questions)){
+    if(!selected[key].size)continue;
+    const sec=document.createElement('div');
+    sec.className='baseline-section';
+    const qs=data[qKey];
+    let html=`<div class="baseline-section-header">
+      <div class="roi-icon icon-${key}" style="width:32px;height:32px;font-size:15px;flex-shrink:0;">${data.icon}</div>
       <span class="baseline-section-title">${data.title}</span>
+      <span class="survey-type-tag ${tagClass}">${tagLabel}</span>
     </div>`;
-    for (const q of data.questions) {
-      html += `<div class="baseline-q"><div class="baseline-q-label">${q.label}`;
-      if (q.type==='rating') html += `<span>1 = not at all, 5 = very much</span>`;
-      html += `</div>`;
-      if (q.type==='rating') {
-        html += `<div class="rating-row">`;
-        for (let i=1;i<=5;i++) html += `<button class="rating-btn" data-id="${q.id}" data-val="${i}" onclick="selectRating(this)">${i}</button>`;
-        html += `</div><div class="rating-labels"><span>Not at all</span><span>Very much</span></div>`;
-      } else if (q.type==='select') {
-        html += `<select class="base-select" id="${q.id}"><option value="">Select one...</option>`;
-        for (const o of q.options) html += `<option value="${o}">${o}</option>`;
-        html += `</select>`;
-      } else {
-        html += `<textarea class="base-textarea" id="${q.id}" placeholder="Type your answer here..."></textarea>`;
+    for(const q of qs){
+      html+=`<div class="baseline-q"><div class="baseline-q-label">${q.label}`;
+      if(q.type==='rating')html+=`<span>1 = not at all · 5 = very much</span>`;
+      html+=`</div>`;
+      if(q.type==='rating'){
+        html+=`<div class="rating-row">`;
+        for(let i=1;i<=5;i++)html+=`<button class="rating-btn" data-id="${q.id}" data-val="${i}" onclick="selectRating(this)">${i}</button>`;
+        html+=`</div><div class="rating-labels"><span>Not at all</span><span>Very much</span></div>`;
+      }else if(q.type==='select'){
+        html+=`<select class="base-select" id="${q.id}"><option value="">Select one...</option>`;
+        for(const o of q.options)html+=`<option value="${o}">${o}</option>`;
+        html+=`</select>`;
+      }else{
+        html+=`<textarea class="base-textarea" id="${q.id}" placeholder="Type your answer here..."></textarea>`;
       }
-      html += `</div>`;
+      html+=`</div>`;
     }
-    sec.innerHTML = html;
+    sec.innerHTML=html;
     container.appendChild(sec);
   }
 }
 
-function selectRating(btn) {
-  const id = btn.dataset.id;
-  document.querySelectorAll(`.rating-btn[data-id="${id}"]`).forEach(b=>b.classList.remove('sel'));
+function selectRating(btn){
+  document.querySelectorAll(`.rating-btn[data-id="${btn.dataset.id}"]`).forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
 }
 
-function collectBaseline() {
-  const data = {};
-  for (const [key, sec] of Object.entries(baselineQuestions)) {
-    if (!selected[key].size) continue;
-    for (const q of sec.questions) {
-      if (q.type==='rating') {
-        const sel = document.querySelector(`.rating-btn[data-id="${q.id}"].sel`);
-        data[q.id] = sel ? sel.dataset.val : '';
-      } else {
-        const el = document.getElementById(q.id);
-        data[q.id] = el ? el.value : '';
+function collectBaseline(){
+  const data={};
+  for(const[key,sec]of Object.entries(questions)){
+    if(!selected[key].size)continue;
+    for(const q of sec[surveyType]){
+      if(q.type==='rating'){
+        const s=document.querySelector(`.rating-btn[data-id="${q.id}"].sel`);
+        data[q.id]=s?s.dataset.val:'';
+      }else{
+        const el=document.getElementById(q.id);
+        data[q.id]=el?el.value:'';
       }
     }
   }
   return data;
 }
 
-function handleSubmit() {
-  const org = document.getElementById('org-name').value.trim() || 'Unknown org';
-  const date = document.getElementById('eng-date').value || '';
-  const contact = document.getElementById('contact-name').value.trim() || '';
-  const baseline = collectBaseline();
-  const payload = {
-    organisation: org, date, contact,
-    financial: Array.from(selected.financial),
-    efficiency: Array.from(selected.efficiency),
-    decision: Array.from(selected.decision),
-    capacity: Array.from(selected.capacity),
-    all: Object.values(selected).flatMap(s=>Array.from(s)),
-    baseline
+function handleSubmit(){
+  const org=document.getElementById('org-name').value.trim()||'Unknown org';
+  const date=document.getElementById('eng-date').value||'';
+  const contact=document.getElementById('contact-name').value.trim()||'';
+  const payload={
+    organisation:org,date,contact,survey_type:surveyType,
+    financial:Array.from(selected.financial),
+    efficiency:Array.from(selected.efficiency),
+    decision:Array.from(selected.decision),
+    capacity:Array.from(selected.capacity),
+    all:Object.values(selected).flatMap(s=>Array.from(s)),
+    baseline:collectBaseline()
   };
-
-  if (SHEET_URL && SHEET_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-    fetch(SHEET_URL, { method:'POST', body: JSON.stringify(payload) })
-      .catch(()=>{});
+  if(SHEET_URL&&SHEET_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+    fetch(SHEET_URL,{method:'POST',body:JSON.stringify(payload)}).catch(()=>{});
   }
-
-  document.getElementById('conf-msg').textContent =
-    `Responses recorded for ${org}${date ? ' · '+date : ''}. The Goalkeep team will use these to shape the engagement and set up baseline tracking.`;
+  const typeLabel=surveyType==='baseline'?'Baseline':'Endline';
+  document.getElementById('conf-msg').textContent=`${typeLabel} responses recorded for ${org}${date?' · '+date:''}. The Goalkeep team will use these to ${surveyType==='baseline'?'set up baseline tracking.':'calculate ROI and review what changed.'}`;
   showScreen(3);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function showScreen(n) {
+function showScreen(n){
   document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n-1));
-  for (let i=1;i<=3;i++) {
-    document.getElementById('sn'+i).className = 'step-num'+(i<n?' done':i===n?' active':'');
-    document.getElementById('sl'+i).className = 'step-label'+(i===n?' active':'');
+  for(let i=1;i<=3;i++){
+    document.getElementById('sn'+i).className='step-num'+(i<n?' done':i===n?' active':'');
+    document.getElementById('sl'+i).className='step-label'+(i===n?' active':'');
   }
 }
 
-function resetAll() {
-  for (const key of Object.keys(selected)) {
+function resetAll(){
+  for(const key of Object.keys(selected)){
     selected[key].clear();
     document.querySelectorAll('#opts-'+key+' .opt').forEach(el=>el.className='opt');
     document.getElementById('badge-'+key).classList.remove('visible');
-    if (openSec[key]) toggleSection(key);
+    if(openSec[key])toggleSection(key);
   }
   document.getElementById('summary').classList.remove('visible');
   document.getElementById('org-name').value='';
-  document.getElementById('eng-date').value='';
+  document.getElementById('eng-date').valueAsDate=new Date();
   document.getElementById('contact-name').value='';
+  setSurveyType('baseline');
   showScreen(1);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// Set today's date as default
-document.getElementById('eng-date').valueAsDate = new Date();
+document.getElementById('eng-date').valueAsDate=new Date();
 </script>
 </body>
 </html>
