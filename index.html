@@ -1,568 +1,967 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROI Expectation Mapper — Goalkeep</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Goalkeep ROI Mapper</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --ink:#1a1a18; --ink-muted:#6b6b62; --ink-faint:#a8a89e;
   --surface:#faf9f6; --surface-2:#f2f0eb; --surface-3:#e8e5de;
-  --border:rgba(26,26,24,0.1); --border-strong:rgba(26,26,24,0.2);
+  --border:rgba(26,26,24,0.12); --border-strong:rgba(26,26,24,0.22);
   --blue-bg:#eaf2fc; --blue-text:#1a5fa8; --blue-border:#b5d0f0;
   --green-bg:#eaf4e2; --green-text:#2d6b12; --green-border:#b8d99a;
   --amber-bg:#fdf0d8; --amber-text:#8a4e08; --amber-border:#f5c97a;
   --purple-bg:#eeedf8; --purple-text:#4c3fb5; --purple-border:#c5c0ec;
-  --radius:12px; --radius-sm:8px;
+  --radius:14px; --radius-sm:9px;
 }
-html { font-size:16px; }
-body { font-family:'DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; font-weight:400; line-height:1.6; }
+body { font-family:'DM Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; line-height:1.55; }
+header { background:#151512; color:white; padding:0.9rem 2rem; display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:50; }
+.gk-logo { height:30px; width:auto; display:block; }
+.header-sep { width:1px; height:22px; background:rgba(255,255,255,0.25); }
+.header-title { font-size:13px; color:rgba(255,255,255,0.74); }
 
-header { border-bottom:1px solid var(--border); padding:0.85rem 2rem; display:flex; align-items:center; gap:14px; background:var(--surface); position:sticky; top:0; z-index:100; }
-.gk-logo { height:26px; width:auto; display:block; }
-.header-sep { width:1px; height:20px; background:var(--border-strong); }
-.header-title { font-size:13px; color:var(--ink-muted); font-weight:400; }
-
-.steps { display:flex; align-items:center; justify-content:center; padding:1.5rem 1rem 0; max-width:460px; margin:0 auto; }
+.steps { display:flex; align-items:center; justify-content:center; padding:1.4rem 1rem 0; max-width:520px; margin:0 auto; }
 .step { display:flex; align-items:center; gap:8px; }
-.step-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:500; border:1.5px solid var(--border-strong); color:var(--ink-faint); background:white; transition:all 0.3s; flex-shrink:0; }
+.step-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; border:1.5px solid var(--border-strong); color:var(--ink-faint); background:white; }
 .step-num.active { border-color:var(--ink); color:var(--ink); }
 .step-num.done { border-color:var(--ink); background:var(--ink); color:var(--surface); }
-.step-label { font-size:12px; color:var(--ink-faint); transition:color 0.3s; white-space:nowrap; }
-.step-label.active { color:var(--ink); font-weight:500; }
-.step-line { width:40px; height:1px; background:var(--border-strong); margin:0 8px; flex-shrink:0; }
+.step-label { font-size:12px; color:var(--ink-faint); white-space:nowrap; }
+.step-label.active { color:var(--ink); font-weight:600; }
+.step-line { width:44px; height:1px; background:var(--border-strong); margin:0 8px; }
 
-.screen { display:none; animation:fadeUp 0.35s ease both; }
+.screen { display:none; animation:fadeUp 0.3s ease both; }
 .screen.active { display:block; }
-
-.hero { max-width:640px; margin:0 auto; padding:2rem 1.5rem 1.5rem; text-align:center; }
-.hero-eyebrow { font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-bottom:0.85rem; display:flex; align-items:center; justify-content:center; gap:8px; }
+.hero { max-width:760px; margin:0 auto; padding:2rem 1.5rem 1rem; text-align:center; }
+.hero-eyebrow { font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-bottom:0.85rem; display:flex; align-items:center; justify-content:center; gap:8px; }
 .hero-eyebrow::before,.hero-eyebrow::after { content:''; width:28px; height:1px; background:var(--border-strong); display:block; }
-h1 { font-family:'DM Serif Display',serif; font-size:clamp(24px,4vw,36px); line-height:1.15; letter-spacing:-0.02em; color:var(--ink); margin-bottom:0.75rem; }
+h1 { font-family:'DM Serif Display',serif; font-size:clamp(26px,4vw,40px); line-height:1.12; letter-spacing:-0.02em; margin-bottom:0.75rem; }
 h1 em { font-style:italic; color:var(--blue-text); }
-.hero-sub { font-size:14px; color:var(--ink-muted); font-weight:300; max-width:440px; margin:0 auto; line-height:1.7; }
+.hero-sub { font-size:14px; color:var(--ink-muted); max-width:560px; margin:0 auto; }
 
-.info-fields { max-width:500px; margin:1.5rem auto 0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+main { max-width:860px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
+.card { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:1.15rem; margin-bottom:12px; }
+.card-title { font-size:15px; font-weight:600; margin-bottom:0.75rem; }
+.info-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .field-wrap { display:flex; flex-direction:column; gap:5px; }
-.field-wrap label { font-size:11px; font-weight:500; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.06em; }
-.field-wrap input { border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px 12px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--ink); background:white; outline:none; transition:border-color 0.15s; }
-.field-wrap input:focus { border-color:var(--ink); }
-.field-wrap input::placeholder { color:var(--ink-faint); }
+.field-wrap label, .input-label { font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:0.055em; }
+input, select, textarea {
+  width:100%; border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:10px 12px;
+  font-size:14px; font-family:'DM Sans',sans-serif; color:var(--ink); background:white; outline:none;
+}
+textarea { resize:vertical; min-height:80px; line-height:1.5; }
+input:focus, select:focus, textarea:focus { border-color:var(--ink); }
 .field-full { grid-column:1/-1; }
 
-main { max-width:700px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
+.type-row { display:flex; gap:10px; margin-top:8px; }
+.type-btn {
+  flex:1; border:1.5px solid var(--border-strong); background:white; border-radius:var(--radius-sm);
+  padding:12px 14px; font:500 14px 'DM Sans',sans-serif; color:var(--ink-muted); cursor:pointer;
+}
+.type-btn.active { background:var(--ink); color:white; border-color:var(--ink); }
 
 .roi-section { margin-bottom:10px; }
-.roi-header { display:flex; align-items:center; gap:12px; padding:1rem 1.25rem; background:white; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:border-color 0.2s,background 0.2s; user-select:none; }
-.roi-header:hover { border-color:var(--border-strong); background:var(--surface-2); }
+.roi-header { display:flex; align-items:center; gap:12px; padding:1rem 1.1rem; background:white; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; user-select:none; }
 .roi-header.open { border-radius:var(--radius) var(--radius) 0 0; border-bottom-color:transparent; }
 .roi-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; }
 .roi-label { flex:1; }
-.roi-label-title { font-size:15px; font-weight:500; color:var(--ink); }
-.roi-label-desc { font-size:12px; color:var(--ink-muted); font-weight:300; margin-top:1px; }
-.roi-badge { font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; display:none; }
+.roi-label-title { font-size:15px; font-weight:600; }
+.roi-label-desc { font-size:12px; color:var(--ink-muted); font-weight:300; }
+.roi-badge { font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; display:none; }
 .roi-badge.visible { display:inline-block; }
-.roi-chevron { width:20px; height:20px; display:flex; align-items:center; justify-content:center; color:var(--ink-faint); transition:transform 0.25s; flex-shrink:0; }
+.roi-chevron { color:var(--ink-faint); transition:transform 0.25s; }
 .roi-chevron.open { transform:rotate(180deg); }
-.roi-chevron svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.roi-body { display:none; padding:1rem 1.25rem 1.25rem; background:white; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); }
+.roi-body { display:none; padding:1rem 1.1rem 1.15rem; background:white; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); }
 .roi-body.open { display:block; }
 .opts-grid { display:flex; flex-wrap:wrap; gap:8px; }
-.opt { font-size:13px; padding:7px 14px; border-radius:20px; border:1px solid var(--border-strong); background:var(--surface-2); color:var(--ink-muted); cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
-.opt:hover { border-color:var(--ink-faint); color:var(--ink); background:var(--surface-3); }
-.opt.sel-financial { background:var(--blue-bg); color:var(--blue-text); border-color:var(--blue-border); font-weight:500; }
-.opt.sel-efficiency { background:var(--green-bg); color:var(--green-text); border-color:var(--green-border); font-weight:500; }
-.opt.sel-decision { background:var(--amber-bg); color:var(--amber-text); border-color:var(--amber-border); font-weight:500; }
-.opt.sel-capacity { background:var(--purple-bg); color:var(--purple-text); border-color:var(--purple-border); font-weight:500; }
-.badge-financial{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
-.badge-efficiency{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
-.badge-decision{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
-.badge-capacity{background:var(--purple-bg);color:var(--purple-text);border:1px solid var(--purple-border)}
+.opt { font-size:13px; padding:7px 13px; border-radius:20px; border:1px solid var(--border-strong); background:var(--surface-2); color:var(--ink-muted); cursor:pointer; }
+.opt:hover { background:var(--surface-3); color:var(--ink); }
+.opt.selected { font-weight:600; border-color:var(--ink); color:var(--ink); background:white; }
+.badge-financial,.chip-financial{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.badge-efficiency,.chip-efficiency{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
+.badge-decision,.chip-decision{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
+.badge-capacity,.chip-capacity{background:var(--purple-bg);color:var(--purple-text);border:1px solid var(--purple-border)}
 .icon-financial{background:var(--blue-bg)} .icon-efficiency{background:var(--green-bg)} .icon-decision{background:var(--amber-bg)} .icon-capacity{background:var(--purple-bg)}
 
-.summary { display:none; margin-top:1.5rem; border:1px solid var(--border); border-radius:var(--radius); background:white; overflow:hidden; }
+.summary { display:none; margin-top:1rem; }
 .summary.visible { display:block; }
-.summary-header { padding:0.9rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-.summary-header-title { font-size:13px; font-weight:500; color:var(--ink); display:flex; align-items:center; gap:6px; }
-.summary-count { font-size:12px; color:var(--ink-muted); }
-.summary-body { padding:1rem 1.25rem; }
-.summary-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1rem; }
-.summary-chip { font-size:12px; padding:4px 11px; border-radius:20px; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.chip { font-size:12px; padding:4px 10px; border-radius:18px; }
 
-.baseline-hero { max-width:640px; margin:0 auto; padding:2rem 1.5rem 1.5rem; text-align:center; }
-.baseline-hero h1 { font-size:clamp(22px,3.5vw,32px); }
+.notice { font-size:13px; color:var(--ink-muted); background:var(--surface-2); border:1px solid var(--border); padding:10px 12px; border-radius:var(--radius-sm); margin-top:10px; }
+.error { color:#9d1c1c; background:#fdecec; border-color:#f1b5b5; }
+.success { color:#245d18; background:#eef7e9; border-color:#c3e0b2; }
 
-.survey-type-wrap { max-width:320px; margin:1rem auto 0; display:flex; gap:8px; }
-.survey-type-btn { flex:1; padding:10px 14px; border:1.5px solid var(--border-strong); border-radius:var(--radius-sm); background:white; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--ink-muted); cursor:pointer; transition:all 0.15s; }
-.survey-type-btn:hover { border-color:var(--ink); color:var(--ink); }
-.survey-type-btn.active { border-color:var(--ink); background:var(--ink); color:white; }
-.survey-type-hint { font-size:11px; color:var(--ink-faint); text-align:center; margin-top:6px; max-width:360px; margin-left:auto; margin-right:auto; }
+.metric-card { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:1.15rem; margin-bottom:12px; }
+.metric-top { display:flex; gap:12px; align-items:flex-start; margin-bottom:12px; }
+.metric-main { flex:1; }
+.metric-title { font-size:15px; font-weight:600; margin-bottom:3px; }
+.metric-meta { font-size:12px; color:var(--ink-muted); }
+.metric-how { font-size:13px; color:var(--ink-muted); background:var(--surface-2); padding:9px 10px; border-radius:var(--radius-sm); margin:8px 0 12px; }
+.metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+.baseline-box { background:var(--blue-bg); border:1px solid var(--blue-border); color:#174a7a; padding:10px 12px; border-radius:var(--radius-sm); margin:8px 0 12px; font-size:13px; }
+.baseline-box strong { display:block; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+.attr-help { font-size:12px; color:var(--ink-muted); margin-top:5px; }
 
-.baseline-section { background:white; border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:10px; }
-.baseline-section-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--border); }
-.baseline-section-title { font-size:14px; font-weight:500; color:var(--ink); flex:1; }
-.survey-type-tag { font-size:10px; padding:2px 8px; border-radius:20px; font-weight:500; }
-.tag-baseline { background:var(--blue-bg); color:var(--blue-text); border:1px solid var(--blue-border); }
-.tag-endline { background:var(--green-bg); color:var(--green-text); border:1px solid var(--green-border); }
-.baseline-q { margin-bottom:1.1rem; }
-.baseline-q:last-child { margin-bottom:0; }
-.baseline-q-label { font-size:13px; color:var(--ink); margin-bottom:8px; line-height:1.5; }
-.baseline-q-label span { font-size:11px; color:var(--ink-faint); font-weight:300; margin-left:6px; }
-.rating-row { display:flex; gap:6px; }
-.rating-btn { width:40px; height:40px; border-radius:var(--radius-sm); border:1px solid var(--border-strong); background:var(--surface-2); color:var(--ink-muted); font-size:13px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
-.rating-btn:hover { border-color:var(--ink-faint); color:var(--ink); }
-.rating-btn.sel { background:var(--ink); color:var(--surface); border-color:var(--ink); }
-.rating-labels { display:flex; justify-content:space-between; font-size:11px; color:var(--ink-faint); margin-top:4px; max-width:236px; }
-.base-select { width:100%; border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); background:white; outline:none; appearance:none; cursor:pointer; }
-.base-textarea { width:100%; border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); background:white; outline:none; resize:vertical; min-height:72px; line-height:1.5; }
-.base-select:focus,.base-textarea:focus { border-color:var(--ink); }
-
-.btn-row { display:flex; gap:10px; margin-top:1.5rem; }
-.btn-primary { flex:1; padding:12px 20px; background:var(--ink); color:var(--surface); border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:background 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-row { display:flex; gap:10px; margin-top:1.25rem; }
+.btn-primary, .btn-secondary {
+  padding:12px 18px; border-radius:var(--radius-sm); font:600 14px 'DM Sans',sans-serif; cursor:pointer; border:1px solid var(--border-strong);
+}
+.btn-primary { background:var(--ink); color:white; border-color:var(--ink); flex:1; }
 .btn-primary:hover { background:#333330; }
-.btn-primary svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-.btn-secondary { padding:12px 20px; background:transparent; border:1px solid var(--border-strong); border-radius:var(--radius-sm); font-size:14px; font-family:'DM Sans',sans-serif; color:var(--ink-muted); cursor:pointer; transition:all 0.15s; }
-.btn-secondary:hover { border-color:var(--ink); color:var(--ink); }
+.btn-secondary { background:transparent; color:var(--ink-muted); }
+.btn-secondary:hover { color:var(--ink); border-color:var(--ink); }
+.btn-small { padding:10px 14px; border-radius:var(--radius-sm); background:var(--ink); color:white; border:none; font:600 13px 'DM Sans',sans-serif; cursor:pointer; }
 
 .conf-wrap { text-align:center; padding:3rem 1.5rem; }
 .conf-icon { width:60px; height:60px; background:var(--green-bg); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:26px; }
-.conf-wrap h2 { font-family:'DM Serif Display',serif; font-size:26px; color:var(--ink); margin-bottom:0.5rem; }
-.conf-wrap p { font-size:14px; color:var(--ink-muted); font-weight:300; max-width:380px; margin:0 auto 1.5rem; line-height:1.7; }
-.btn-reset { padding:8px 20px; background:transparent; border:1px solid var(--border-strong); border-radius:var(--radius-sm); font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink-muted); cursor:pointer; transition:all 0.15s; }
-.btn-reset:hover { border-color:var(--ink); color:var(--ink); }
-
-footer { text-align:center; padding:1.5rem; font-size:12px; color:var(--ink-faint); border-top:1px solid var(--border); margin-top:2rem; }
+.conf-wrap h2 { font-family:'DM Serif Display',serif; font-size:28px; margin-bottom:0.5rem; }
+.conf-wrap p { font-size:14px; color:var(--ink-muted); max-width:520px; margin:0 auto 1rem; }
+.engagement-id-box { background:#151512; color:white; border-radius:var(--radius); padding:14px; font-size:14px; max-width:520px; margin:1rem auto; }
+.engagement-id { font-family:monospace; font-size:16px; letter-spacing:0.02em; margin-top:5px; display:block; }
+footer { text-align:center; padding:1.5rem; font-size:12px; color:var(--ink-faint); border-top:1px solid var(--border); }
 footer a { color:var(--ink-muted); text-decoration:none; }
+
 @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-@media(max-width:520px){ header{padding:0.85rem 1rem} .info-fields{grid-template-columns:1fr} main{padding:1rem 1rem 3rem} }
+@media(max-width:640px){
+  header{padding:0.85rem 1rem}
+  main{padding:1rem 1rem 3rem}
+  .info-fields,.metric-grid{grid-template-columns:1fr}
+  .type-row{flex-direction:column}
+  .steps{max-width:100%; overflow:auto; justify-content:flex-start; padding-left:1rem}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <img class="gk-logo" src="data:image/png;base64,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" alt="Goalkeep" />
+  <img class="gk-logo" src="data:image/png;base64,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" alt="Goalkeep" />
   <div class="header-sep"></div>
-  <span class="header-title">ROI Expectation Mapper</span>
+  <span class="header-title">ROI Mapper</span>
 </header>
 
 <div class="steps">
-  <div class="step">
-    <div class="step-num active" id="sn1">1</div>
-    <span class="step-label active" id="sl1">Expectations</span>
-  </div>
+  <div class="step"><div class="step-num active" id="sn1">1</div><span class="step-label active" id="sl1">Setup</span></div>
   <div class="step-line"></div>
-  <div class="step">
-    <div class="step-num" id="sn2">2</div>
-    <span class="step-label" id="sl2">Baseline / Endline</span>
-  </div>
+  <div class="step"><div class="step-num" id="sn2">2</div><span class="step-label" id="sl2">Metric data</span></div>
   <div class="step-line"></div>
-  <div class="step">
-    <div class="step-num" id="sn3">3</div>
-    <span class="step-label" id="sl3">Done</span>
-  </div>
+  <div class="step"><div class="step-num" id="sn3">3</div><span class="step-label" id="sl3">Done</span></div>
 </div>
 
-<!-- SCREEN 1 -->
-<div class="screen active" id="screen1">
+<section class="screen active" id="screen1">
   <div class="hero">
     <div class="hero-eyebrow">Step 1 of 2</div>
-    <h1>What do you expect<br>will <em>change</em> after<br>this engagement?</h1>
-    <p class="hero-sub">Select the metrics that matter most to your organisation.</p>
-    <div class="info-fields">
-      <div class="field-wrap">
-        <label for="org-name">Organisation</label>
-        <input type="text" id="org-name" placeholder="e.g. Happy Feet Home" />
-      </div>
-      <div class="field-wrap">
-        <label for="eng-date">Date of engagement</label>
-        <input type="date" id="eng-date" />
-      </div>
-      <div class="field-wrap field-full">
-        <label for="contact-name">Your name</label>
-        <input type="text" id="contact-name" placeholder="e.g. Priya Sharma" />
-      </div>
-    </div>
+    <h1>Set up the <em>ROI</em><br>measurement record</h1>
+    <p class="hero-sub">Choose whether this is a baseline or endline entry. Baseline creates the record; endline pulls the earlier baseline values using Engagement ID.</p>
   </div>
 
   <main>
-    <!-- FINANCIAL -->
-    <div class="roi-section">
-      <div class="roi-header" onclick="toggleSection('financial')">
-        <div class="roi-icon icon-financial">💰</div>
-        <div class="roi-label">
-          <div class="roi-label-title">Financial ROI</div>
-          <div class="roi-label-desc">Funding, cost savings, donor confidence</div>
+    <div class="card">
+      <div class="card-title">Client / engagement details</div>
+      <div class="info-fields">
+        <div class="field-wrap">
+          <label for="org-name">Organisation</label>
+          <input type="text" id="org-name" placeholder="e.g. MRC" />
         </div>
-        <span class="roi-badge badge-financial" id="badge-financial"></span>
-        <div class="roi-chevron" id="chev-financial"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-      </div>
-      <div class="roi-body" id="body-financial">
-        <div class="opts-grid" id="opts-financial">
-          <span class="opt" onclick="toggleOpt(this,'financial')">Funding raised where Goalkeep outputs were used</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Budget growth associated with Goalkeep's work</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Cost saved by reducing external dependency</span>
-          <span class="opt" onclick="toggleOpt(this,'financial')">Cost saved through automation / time reduction</span>
+        <div class="field-wrap">
+          <label for="eng-date">Engagement date</label>
+          <input type="date" id="eng-date" />
+        </div>
+        <div class="field-wrap field-full">
+          <label for="contact-name">Respondent name</label>
+          <input type="text" id="contact-name" placeholder="e.g. Priya Sharma" />
         </div>
       </div>
     </div>
 
-    <!-- EFFICIENCY -->
-    <div class="roi-section">
-      <div class="roi-header" onclick="toggleSection('efficiency')">
-        <div class="roi-icon icon-efficiency">⚡</div>
-        <div class="roi-label">
-          <div class="roi-label-title">Efficiency ROI</div>
-          <div class="roi-label-desc">Less manual work, faster reporting</div>
-        </div>
-        <span class="roi-badge badge-efficiency" id="badge-efficiency"></span>
-        <div class="roi-chevron" id="chev-efficiency"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="card">
+      <div class="card-title">What are you filling?</div>
+      <div class="type-row">
+        <button class="type-btn active" id="type-baseline" onclick="setSurveyType('baseline')">📋 Baseline</button>
+        <button class="type-btn" id="type-endline" onclick="setSurveyType('endline')">📊 Endline / 6-month review</button>
       </div>
-      <div class="roi-body" id="body-efficiency">
-        <div class="opts-grid" id="opts-efficiency">
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Reduction in manual data requests</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Time saved in reporting</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Reduction in duplicate trackers</span>
-          <span class="opt" onclick="toggleOpt(this,'efficiency')">Faster access to data</span>
+      <div class="notice" id="type-hint">Baseline captures the current situation before or at the start of Goalkeep’s engagement.</div>
+    </div>
+
+    <div id="baseline-setup">
+      <div class="card">
+        <div class="card-title">Select the metric / evidence options to track</div>
+        <div id="metric-select-container"></div>
+        <div class="summary" id="summary">
+          <div class="card-title" style="margin-top:1rem;">Selected metrics</div>
+          <div class="chips" id="summary-chips"></div>
         </div>
       </div>
     </div>
 
-    <!-- DECISION -->
-    <div class="roi-section">
-      <div class="roi-header" onclick="toggleSection('decision')">
-        <div class="roi-icon icon-decision">🧭</div>
-        <div class="roi-label">
-          <div class="roi-label-title">Decision-making ROI</div>
-          <div class="roi-label-desc">Better planning, sharper priorities</div>
+    <div id="endline-setup" style="display:none;">
+      <div class="card">
+        <div class="card-title">Load baseline record</div>
+        <p class="hero-sub" style="text-align:left;margin:0 0 10px;">Enter the Engagement ID generated during baseline. The endline form will show the baseline values as read-only.</p>
+        <div class="info-fields">
+          <div class="field-wrap field-full">
+            <label for="lookup-engagement-id">Engagement ID</label>
+            <input type="text" id="lookup-engagement-id" placeholder="e.g. MRC_20260609" />
+          </div>
         </div>
-        <span class="roi-badge badge-decision" id="badge-decision"></span>
-        <div class="roi-chevron" id="chev-decision"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-      </div>
-      <div class="roi-body" id="body-decision">
-        <div class="opts-grid" id="opts-decision">
-          <span class="opt" onclick="toggleOpt(this,'decision')">Number of decisions influenced by dashboard / data</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Improvement in program indicators linked to data use</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Better target planning</span>
-          <span class="opt" onclick="toggleOpt(this,'decision')">Improved donor / leadership communication</span>
+        <div class="btn-row">
+          <button class="btn-small" onclick="loadBaseline()">Load baseline</button>
         </div>
-      </div>
-    </div>
-
-    <!-- CAPACITY -->
-    <div class="roi-section">
-      <div class="roi-header" onclick="toggleSection('capacity')">
-        <div class="roi-icon icon-capacity">🌱</div>
-        <div class="roi-label">
-          <div class="roi-label-title">Capacity & data culture</div>
-          <div class="roi-label-desc">Skills, habits, sustained adoption</div>
-        </div>
-        <span class="roi-badge badge-capacity" id="badge-capacity"></span>
-        <div class="roi-chevron" id="chev-capacity"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-      </div>
-      <div class="roi-body" id="body-capacity">
-        <div class="opts-grid" id="opts-capacity">
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Staff trained</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Improvement in pre / post assessment scores</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Continued use of training materials</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Internal replication of Goalkeep methods</span>
-          <span class="opt" onclick="toggleOpt(this,'capacity')">Dashboard adoption</span>
+        <div id="baseline-load-msg"></div>
+        <div class="summary" id="loaded-summary">
+          <div class="card-title" style="margin-top:1rem;">Loaded baseline metrics</div>
+          <div class="chips" id="loaded-chips"></div>
         </div>
       </div>
     </div>
 
-    <div class="summary" id="summary">
-      <div class="summary-header">
-        <span class="summary-header-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Your selections
-        </span>
-        <span class="summary-count" id="summary-count"></span>
-      </div>
-      <div class="summary-body">
-        <div class="summary-chips" id="summary-chips"></div>
-        <button class="btn-primary" onclick="goToBaseline()">
-          Next: baseline / endline questions
-          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </button>
-      </div>
-    </div>
-  </main>
-</div>
-
-<!-- SCREEN 2 -->
-<div class="screen" id="screen2">
-  <div class="baseline-hero">
-    <div class="hero-eyebrow">Step 2 of 2</div>
-    <h1>A few <em>data</em><br>questions</h1>
-    <p class="hero-sub">Are you filling this at the start of the engagement or six months after?</p>
-    <div class="survey-type-wrap">
-      <button class="survey-type-btn active" id="btn-baseline" onclick="setSurveyType('baseline')">📋 Baseline</button>
-      <button class="survey-type-btn" id="btn-endline" onclick="setSurveyType('endline')">📊 Endline</button>
-    </div>
-    <p class="survey-type-hint" id="survey-type-hint">Baseline: fill at the start — captures your current situation before Goalkeep's work begins.</p>
-  </div>
-  <main>
-    <div id="baseline-sections"></div>
     <div class="btn-row">
-      <button class="btn-secondary" onclick="goBack()">← Back</button>
-      <button class="btn-primary" onclick="handleSubmit()">
-        Submit
-        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </button>
+      <button class="btn-primary" onclick="goToMetricData()">Next: fill metric data</button>
     </div>
   </main>
-</div>
+</section>
 
-<!-- SCREEN 3 -->
-<div class="screen" id="screen3">
+<section class="screen" id="screen2">
+  <div class="hero">
+    <div class="hero-eyebrow">Step 2 of 2</div>
+    <h1 id="metric-screen-title">Fill metric-wise <em>baseline</em> data</h1>
+    <p class="hero-sub" id="metric-screen-sub">For each selected metric, enter the value, numeric value, and evidence/source.</p>
+  </div>
+  <main>
+    <div id="metric-form-container"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showScreen(1)">← Back</button>
+      <button class="btn-primary" id="submit-btn" onclick="handleSubmit()">Submit</button>
+    </div>
+  </main>
+</section>
+
+<section class="screen" id="screen3">
   <main>
     <div class="conf-wrap">
       <div class="conf-icon">✓</div>
       <h2>Thank you</h2>
       <p id="conf-msg">Your responses have been recorded.</p>
-      <button class="btn-reset" onclick="resetAll()">Start over</button>
+      <div id="engagement-id-output"></div>
+      <button class="btn-secondary" onclick="resetAll()">Start over</button>
     </div>
   </main>
-</div>
+</section>
 
-<footer>
-  <a href="https://goalkeep.net" target="_blank">goalkeep.net</a> · ROI Expectation Mapper · 2026
-</footer>
+<footer><a href="https://goalkeep.net" target="_blank">goalkeep.net</a> · ROI Mapper · 2026</footer>
 
 <script>
+/**
+ * IMPORTANT:
+ * Replace this with your Apps Script Web App URL after deployment.
+ */
 const SHEET_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
-const selected = { financial:new Set(), efficiency:new Set(), decision:new Set(), capacity:new Set() };
-const openSec = { financial:false, efficiency:false, decision:false, capacity:false };
-let surveyType = 'baseline';
 
-const chipColors = {
-  financial:'background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)',
-  efficiency:'background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)',
-  decision:'background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)',
-  capacity:'background:var(--purple-bg);color:var(--purple-text);border:1px solid var(--purple-border)'
-};
-
-const questions = {
-  financial: {
-    icon:'💰', title:'Financial ROI',
-    baseline:[
-      { id:'fin_funding_use_bl', label:'Are Goalkeep outputs (reports, dashboards, ToC) currently used in donor conversations or proposals?', type:'select', options:['Not yet','Sometimes','Regularly'] },
-      { id:'fin_consultant_dep_bl', label:'Does your org currently rely on external consultants for data or reporting work?', type:'select', options:['Yes, heavily','Yes, occasionally','No'] },
-      { id:'fin_donor_confidence_bl', label:'How confident is your team presenting data to donors today?', type:'rating' }
-    ],
-    endline:[
-      { id:'fin_funding_raised_el', label:'Has any funding been raised where Goalkeep outputs directly supported the proposal or conversation?', type:'select', options:['Yes — confirmed amount','Yes — approximate','Not confirmed yet','No'] },
-      { id:'fin_consultant_change_el', label:'Has dependence on external consultants for data work changed?', type:'select', options:['Significantly reduced','Somewhat reduced','No change','Increased'] },
-      { id:'fin_donor_confidence_el', label:'How confident is your team presenting data to donors now?', type:'rating' }
-    ]
+const METRIC_CONFIG = [
+  {
+    "metric_id": "fin_funding_raised",
+    "roi_area": "Financial ROI",
+    "metric_evidence": "Funding raised where Goalkeep outputs were used",
+    "how_to_collect": "Ask client if Goalkeep reports, dashboards, ToC, or data were used in proposals/donor conversations",
+    "example_calculation": "Funding influenced × attribution %",
+    "unit": "₹",
+    "direction": "higher_better",
+    "baseline_question": "Before this engagement, how much funding was already clearly linked to existing data outputs, reports, dashboards, or ToC material?",
+    "endline_question": "Since the engagement, has any funding been raised or influenced where Goalkeep outputs were used? Enter the estimated amount and describe the evidence.",
+    "value_per_unit_default": 1,
+    "value_basis_default": "Funding amount directly entered by client."
   },
-  efficiency: {
-    icon:'⚡', title:'Efficiency ROI',
-    baseline:[
-      { id:'eff_requests_bl', label:'How many manual data or report requests does your MEL team receive per month?', type:'select', options:['0–10','10–30','30–80','80–200','200+'] },
-      { id:'eff_report_time_bl', label:'How many hours does your team spend preparing a monthly / quarterly report?', type:'select', options:['Under 5 hrs','5–10 hrs','10–20 hrs','20+ hrs'] },
-      { id:'eff_trackers_bl', label:'How many separate data trackers or spreadsheets does your team maintain?', type:'select', options:['1–3','4–8','9–15','15+'] },
-      { id:'eff_data_access_bl', label:'How easy is it for staff to access the data they need without asking someone?', type:'rating' }
-    ],
-    endline:[
-      { id:'eff_requests_el', label:'How many manual data or report requests does your MEL team receive per month now?', type:'select', options:['0–10','10–30','30–80','80–200','200+'] },
-      { id:'eff_report_time_el', label:'How many hours does your team now spend preparing a monthly / quarterly report?', type:'select', options:['Under 5 hrs','5–10 hrs','10–20 hrs','20+ hrs'] },
-      { id:'eff_trackers_el', label:'How many separate data trackers or spreadsheets does your team maintain now?', type:'select', options:['1–3','4–8','9–15','15+'] },
-      { id:'eff_data_access_el', label:'How easy is it now for staff to access data without asking someone?', type:'rating' }
-    ]
+  {
+    "metric_id": "fin_budget_growth",
+    "roi_area": "Financial ROI",
+    "metric_evidence": "Budget growth associated with Goalkeep’s work",
+    "how_to_collect": "Compare budget before and after engagement; ask client attribution",
+    "example_calculation": "Budget increase × attribution %",
+    "unit": "₹",
+    "direction": "higher_better",
+    "baseline_question": "What was the relevant programme/project budget before Goalkeep’s engagement?",
+    "endline_question": "What is the relevant programme/project budget now, and how much of the increase do you think Goalkeep’s work contributed to?",
+    "value_per_unit_default": 1,
+    "value_basis_default": "Budget increase directly entered by client."
   },
-  decision: {
-    icon:'🧭', title:'Decision-making ROI',
-    baseline:[
-      { id:'dec_decisions_bl', label:'How many data-driven decisions does your team make per month (program reviews, target changes, strategy shifts)?', type:'select', options:['0–2','3–6','7–12','12+'] },
-      { id:'dec_reviews_bl', label:'How often does your team use data in program review or planning meetings?', type:'select', options:['Rarely or never','Sometimes','Most of the time','Always'] },
-      { id:'dec_reports_bl', label:'How many reports or decks per quarter use Goalkeep-supported data?', type:'select', options:['0','1–2','3–5','5+'] },
-      { id:'dec_confidence_bl', label:'How confident is leadership in using data to make decisions today?', type:'rating' }
-    ],
-    endline:[
-      { id:'dec_decisions_el', label:'How many data-driven decisions does your team make per month now?', type:'select', options:['0–2','3–6','7–12','12+'] },
-      { id:'dec_reviews_el', label:'How often does your team now use data in program review or planning meetings?', type:'select', options:['Rarely or never','Sometimes','Most of the time','Always'] },
-      { id:'dec_reports_el', label:'How many reports or decks per quarter now use Goalkeep-supported data?', type:'select', options:['0','1–2','3–5','5+'] },
-      { id:'dec_confidence_el', label:'How confident is leadership in using data to make decisions now?', type:'rating' }
-    ]
+  {
+    "metric_id": "fin_external_dependency",
+    "roi_area": "Financial ROI",
+    "metric_evidence": "Cost saved by reducing external dependency",
+    "how_to_collect": "Ask what work the client can now do internally",
+    "example_calculation": "External cost avoided × attribution %",
+    "unit": "₹/year",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how much did you spend or expect to spend annually on external support for this type of data/reporting work?",
+    "endline_question": "What data/reporting work can your team now do internally, and what annual external cost has been avoided?",
+    "value_per_unit_default": 1,
+    "value_basis_default": "External cost avoided directly entered by client."
   },
-  capacity: {
-    icon:'🌱', title:'Capacity & data culture',
-    baseline:[
-      { id:'cap_staff_count_bl', label:'How many staff will be involved in this engagement?', type:'select', options:['1–5','6–15','16–30','30+'] },
-      { id:'cap_comfort_bl', label:'How comfortable does your team feel working with data today?', type:'rating' },
-      { id:'cap_dep_bl', label:'Is data responsibility concentrated in one person or distributed across the team?', type:'select', options:['One person handles everything','A small group of 2–3','Fairly distributed'] },
-      { id:'cap_training_bl', label:'Has the team received data training before? Briefly describe what was covered.', type:'textarea' }
-    ],
-    endline:[
-      { id:'cap_comfort_el', label:'How comfortable does your team feel working with data now?', type:'rating' },
-      { id:'cap_score_change_el', label:'Did participants show improvement in pre/post assessment scores?', type:'select', options:['Yes — significant improvement','Yes — some improvement','No change','No assessment run'] },
-      { id:'cap_systems_used_el', label:'Are Goalkeep-built dashboards or systems still actively used?', type:'select', options:['Yes, regularly','Occasionally','Rarely','Not at all'] },
-      { id:'cap_replication_el', label:'Has the team independently replicated or adapted any Goalkeep methods or templates?', type:'textarea' }
-    ]
+  {
+    "metric_id": "fin_automation_time_saving",
+    "roi_area": "Financial ROI",
+    "metric_evidence": "Cost saved through automation/time reduction",
+    "how_to_collect": "Estimate hours saved × staff cost",
+    "example_calculation": "Hours saved × hourly cost × attribution %",
+    "unit": "Hours/month",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how many staff hours per month were spent on the manual task/process?",
+    "endline_question": "How many staff hours per month are now saved because of automation, dashboards, or improved processes?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Enter estimated staff cost per hour or per unit later."
+  },
+  {
+    "metric_id": "eff_manual_requests",
+    "roi_area": "Efficiency ROI",
+    "metric_evidence": "Reduction in manual data requests",
+    "how_to_collect": "Compare monthly requests before/after",
+    "example_calculation": "Requests reduced × hours/request × staff cost × attribution %",
+    "unit": "Requests/month",
+    "direction": "lower_better",
+    "baseline_question": "How many manual data/report extraction requests does your team currently receive per month?",
+    "endline_question": "How many manual data/report extraction requests does your team receive now?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can be calculated later as hours/request × staff cost."
+  },
+  {
+    "metric_id": "eff_reporting_time",
+    "roi_area": "Efficiency ROI",
+    "metric_evidence": "Time saved in reporting",
+    "how_to_collect": "Ask reporting time before and after",
+    "example_calculation": "Hours saved/report × reports/year × staff cost × attribution %",
+    "unit": "Hours/report",
+    "direction": "lower_better",
+    "baseline_question": "How many hours did your team usually spend preparing one recurring report before this engagement?",
+    "endline_question": "How many hours does the same recurring report take now?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can be calculated later using estimated staff cost per hour."
+  },
+  {
+    "metric_id": "eff_duplicate_trackers",
+    "roi_area": "Efficiency ROI",
+    "metric_evidence": "Reduction in duplicate trackers",
+    "how_to_collect": "Count trackers before/after",
+    "example_calculation": "Time saved from consolidation × attribution %",
+    "unit": "Trackers",
+    "direction": "lower_better",
+    "baseline_question": "How many separate trackers/spreadsheets were being maintained for this work before the engagement?",
+    "endline_question": "How many separate trackers/spreadsheets are being maintained for this work now?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can be calculated later based on time saved from consolidation."
+  },
+  {
+    "metric_id": "eff_data_access",
+    "roi_area": "Efficiency ROI",
+    "metric_evidence": "Faster access to data",
+    "how_to_collect": "Ask who can now access data directly",
+    "example_calculation": "Number of users × estimated time saved",
+    "unit": "Users/roles",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how many users/roles could access the required data directly without asking another team?",
+    "endline_question": "How many users/roles can now access the required data directly without asking another team?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can be calculated later using estimated time saved per user."
+  },
+  {
+    "metric_id": "dec_decisions_influenced",
+    "roi_area": "Decision-making ROI",
+    "metric_evidence": "Number of decisions influenced by dashboard/data",
+    "how_to_collect": "Ask for examples of decisions, strategy shifts, or course corrections",
+    "example_calculation": "Can be shown as decision stories; monetisation optional",
+    "unit": "Decisions/month",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, approximately how many programme/strategy decisions per month were directly informed by data?",
+    "endline_question": "How many programme/strategy decisions per month are now directly informed by data? Please give examples.",
+    "value_per_unit_default": "",
+    "value_basis_default": "Usually qualitative or proxy-based."
+  },
+  {
+    "metric_id": "dec_program_indicator_improvement",
+    "roi_area": "Decision-making ROI",
+    "metric_evidence": "Improvement in program indicators linked to data use",
+    "how_to_collect": "Compare indicator before/after",
+    "example_calculation": "Indicator improvement × attribution %",
+    "unit": "Indicator value",
+    "direction": "higher_better",
+    "baseline_question": "What was the baseline value of the programme indicator you expected data use to improve?",
+    "endline_question": "What is the current value of that programme indicator, and how was data used to influence the change?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Define value per unit only if this indicator can be monetised."
+  },
+  {
+    "metric_id": "dec_target_planning",
+    "roi_area": "Decision-making ROI",
+    "metric_evidence": "Better target planning",
+    "how_to_collect": "Ask if targets/run rates are now reviewed differently",
+    "example_calculation": "Time saved or improved planning quality",
+    "unit": "Planning instances/quarter",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how often were targets/run rates reviewed using reliable data?",
+    "endline_question": "How often are targets/run rates now reviewed using reliable data? What changed in planning quality?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Usually qualitative or proxy-based."
+  },
+  {
+    "metric_id": "dec_donor_leadership_communication",
+    "roi_area": "Decision-making ROI",
+    "metric_evidence": "Improved donor/leadership communication",
+    "how_to_collect": "Ask where data has been used",
+    "example_calculation": "Number of reports/decks/proposals using Goalkeep outputs",
+    "unit": "Reports/decks/proposals",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how many donor/leadership reports, decks, or proposals used reliable data outputs per quarter?",
+    "endline_question": "How many donor/leadership reports, decks, or proposals now use Goalkeep-supported outputs per quarter?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can be qualitative or proxy-based."
+  },
+  {
+    "metric_id": "cap_staff_trained",
+    "roi_area": "Capacity Building & Data Culture ROI",
+    "metric_evidence": "Staff trained",
+    "how_to_collect": "Training records",
+    "example_calculation": "Number trained × role/function",
+    "unit": "Staff",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how many staff had already been trained on the relevant data system/process?",
+    "endline_question": "How many staff have now been trained on the relevant data system/process?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can use training cost proxy if needed."
+  },
+  {
+    "metric_id": "cap_assessment_scores",
+    "roi_area": "Capacity Building & Data Culture ROI",
+    "metric_evidence": "Improvement in pre/post assessment scores",
+    "how_to_collect": "Training assessment data",
+    "example_calculation": "Score improvement × number of participants",
+    "unit": "Score",
+    "direction": "higher_better",
+    "baseline_question": "What was the average pre-assessment or baseline data confidence score?",
+    "endline_question": "What was the average post-assessment or current data confidence score?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can be monetised only if a proxy value is agreed."
+  },
+  {
+    "metric_id": "cap_training_materials",
+    "roi_area": "Capacity Building & Data Culture ROI",
+    "metric_evidence": "Continued use of training materials",
+    "how_to_collect": "Client interview / usage examples",
+    "example_calculation": "Qualitative evidence",
+    "unit": "Usage examples",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how often were existing data training materials used by the team?",
+    "endline_question": "Are Goalkeep-created or Goalkeep-supported training materials still being used? Give examples.",
+    "value_per_unit_default": "",
+    "value_basis_default": "Usually qualitative evidence."
+  },
+  {
+    "metric_id": "cap_internal_replication",
+    "roi_area": "Capacity Building & Data Culture ROI",
+    "metric_evidence": "Internal replication of Goalkeep methods",
+    "how_to_collect": "Ask if client uses key questions, templates, dashboards, or training style independently",
+    "example_calculation": "Number of replications/adaptations",
+    "unit": "Replications/adaptations",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how many similar templates, dashboards, methods, or training approaches had your team independently replicated?",
+    "endline_question": "Since the engagement, how many Goalkeep methods/templates/dashboards/training approaches has your team independently replicated or adapted?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can use conservative development or training proxy if needed."
+  },
+  {
+    "metric_id": "cap_dashboard_adoption",
+    "roi_area": "Capacity Building & Data Culture ROI",
+    "metric_evidence": "Dashboard adoption",
+    "how_to_collect": "Usage analytics",
+    "example_calculation": "Active users, frequency of visits, review meetings using dashboard",
+    "unit": "Active users/review meetings",
+    "direction": "higher_better",
+    "baseline_question": "Before the engagement, how many active users or review meetings regularly used dashboards/data tools?",
+    "endline_question": "How many active users or review meetings now regularly use the dashboard/data tool?",
+    "value_per_unit_default": "",
+    "value_basis_default": "Can use usage analytics or client-reported usage."
   }
+];
+
+const ROI_GROUPS = {
+  'Financial ROI': { key:'financial', icon:'💰', desc:'Funding, cost savings, donor confidence' },
+  'Efficiency ROI': { key:'efficiency', icon:'⚡', desc:'Less manual work, faster reporting' },
+  'Decision-making ROI': { key:'decision', icon:'🧭', desc:'Better planning, sharper priorities' },
+  'Capacity Building & Data Culture ROI': { key:'capacity', icon:'🌱', desc:'Skills, habits, sustained adoption' }
 };
+
+const ATTRIBUTION = {
+  'Low contribution': 0.25,
+  'Medium contribution': 0.50,
+  'High contribution': 0.75,
+  'Very high contribution': 1.00
+};
+
+let surveyType = 'baseline';
+let selectedMetricIds = new Set();
+let openSec = {};
+let loadedBaseline = null;
+let currentEngagementId = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('eng-date').valueAsDate = new Date();
+  renderMetricSelection();
+});
+
+function areaKey(area) {
+  return ROI_GROUPS[area] ? ROI_GROUPS[area].key : 'financial';
+}
+
+function metricById(metricId) {
+  return METRIC_CONFIG.find(m => m.metric_id === metricId);
+}
 
 function setSurveyType(type) {
   surveyType = type;
-  document.getElementById('btn-baseline').classList.toggle('active', type==='baseline');
-  document.getElementById('btn-endline').classList.toggle('active', type==='endline');
-  document.getElementById('survey-type-hint').textContent = type==='baseline'
-    ? 'Baseline: fill at the start — captures your current situation before Goalkeep\'s work begins.'
-    : 'Endline: fill ~6 months after the engagement — captures what changed and what Goalkeep contributed.';
-  if (document.getElementById('baseline-sections').children.length > 0) buildBaseline();
+  document.getElementById('type-baseline').classList.toggle('active', type === 'baseline');
+  document.getElementById('type-endline').classList.toggle('active', type === 'endline');
+  document.getElementById('baseline-setup').style.display = type === 'baseline' ? 'block' : 'none';
+  document.getElementById('endline-setup').style.display = type === 'endline' ? 'block' : 'none';
+  document.getElementById('type-hint').textContent = type === 'baseline'
+    ? 'Baseline captures the current situation before or at the start of Goalkeep’s engagement.'
+    : 'Endline pulls the saved baseline values and records what changed after the engagement.';
+}
+
+function renderMetricSelection() {
+  const container = document.getElementById('metric-select-container');
+  container.innerHTML = '';
+
+  Object.entries(ROI_GROUPS).forEach(([area, group]) => {
+    openSec[group.key] = false;
+    const metrics = METRIC_CONFIG.filter(m => m.roi_area === area);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'roi-section';
+    wrapper.innerHTML = `
+      <div class="roi-header" onclick="toggleSection('${group.key}')">
+        <div class="roi-icon icon-${group.key}">${group.icon}</div>
+        <div class="roi-label">
+          <div class="roi-label-title">${area}</div>
+          <div class="roi-label-desc">${group.desc}</div>
+        </div>
+        <span class="roi-badge badge-${group.key}" id="badge-${group.key}"></span>
+        <div class="roi-chevron" id="chev-${group.key}">⌄</div>
+      </div>
+      <div class="roi-body" id="body-${group.key}">
+        <div class="opts-grid">
+          ${metrics.map(m => `<span class="opt" data-metric-id="${m.metric_id}" onclick="toggleMetric(event, '${m.metric_id}')">${m.metric_evidence}</span>`).join('')}
+        </div>
+      </div>
+    `;
+    container.appendChild(wrapper);
+  });
 }
 
 function toggleSection(key) {
   openSec[key] = !openSec[key];
-  document.getElementById('body-'+key).classList.toggle('open', openSec[key]);
-  document.getElementById('chev-'+key).classList.toggle('open', openSec[key]);
-  document.getElementById('body-'+key).previousElementSibling.classList.toggle('open', openSec[key]);
+  document.getElementById('body-' + key).classList.toggle('open', openSec[key]);
+  document.getElementById('chev-' + key).classList.toggle('open', openSec[key]);
+  document.getElementById('body-' + key).previousElementSibling.classList.toggle('open', openSec[key]);
 }
 
-function toggleOpt(el, key) {
-  const text = el.textContent.trim();
-  if (selected[key].has(text)) { selected[key].delete(text); el.classList.remove('sel-'+key); }
-  else { selected[key].add(text); el.classList.add('sel-'+key); }
-  updateBadge(key); updateSummary();
+function toggleMetric(event, metricId) {
+  event.stopPropagation();
+  const el = event.currentTarget;
+  if (selectedMetricIds.has(metricId)) {
+    selectedMetricIds.delete(metricId);
+    el.classList.remove('selected');
+  } else {
+    selectedMetricIds.add(metricId);
+    el.classList.add('selected');
+  }
+  updateBadges();
+  updateSummary();
 }
 
-function updateBadge(key) {
-  const badge = document.getElementById('badge-'+key);
-  const n = selected[key].size;
-  if (n>0){badge.textContent=n+' selected';badge.classList.add('visible');}
-  else{badge.classList.remove('visible');}
+function updateBadges() {
+  Object.values(ROI_GROUPS).forEach(group => {
+    const n = Array.from(selectedMetricIds).filter(id => areaKey(metricById(id).roi_area) === group.key).length;
+    const badge = document.getElementById('badge-' + group.key);
+    if (n > 0) {
+      badge.textContent = n + ' selected';
+      badge.classList.add('visible');
+    } else {
+      badge.classList.remove('visible');
+    }
+  });
 }
 
 function updateSummary() {
-  const all=[];
-  for(const[key,set]of Object.entries(selected))for(const item of set)all.push({text:item,key});
-  const summary=document.getElementById('summary');
-  if(!all.length){summary.classList.remove('visible');return;}
+  const summary = document.getElementById('summary');
+  const chips = document.getElementById('summary-chips');
+  const selected = Array.from(selectedMetricIds).map(metricById);
+  if (!selected.length) {
+    summary.classList.remove('visible');
+    chips.innerHTML = '';
+    return;
+  }
   summary.classList.add('visible');
-  document.getElementById('summary-count').textContent=all.length+' item'+(all.length!==1?'s':'');
-  document.getElementById('summary-chips').innerHTML=all.map(({text,key})=>`<span class="summary-chip" style="${chipColors[key]}">${text}</span>`).join('');
+  chips.innerHTML = selected.map(m => `<span class="chip chip-${areaKey(m.roi_area)}">${m.metric_evidence}</span>`).join('');
 }
 
-function goToBaseline() {
-  const all=Object.values(selected).flatMap(s=>Array.from(s));
-  if(!all.length){alert('Please select at least one metric.');return;}
-  buildBaseline();
+function makeEngagementId(org, dateValue) {
+  const cleanOrg = (org || 'ORG').trim().toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  const cleanDate = (dateValue || new Date().toISOString().slice(0,10)).replace(/[^0-9]/g, '');
+  return `${cleanOrg || 'ORG'}_${cleanDate}`;
+}
+
+function goToMetricData() {
+  const org = document.getElementById('org-name').value.trim();
+  const date = document.getElementById('eng-date').value;
+
+  if (surveyType === 'baseline') {
+    if (!org) return alert('Please enter organisation name.');
+    if (!date) return alert('Please enter engagement date.');
+    if (!selectedMetricIds.size) return alert('Please select at least one metric.');
+    currentEngagementId = makeEngagementId(org, date);
+  }
+
+  if (surveyType === 'endline') {
+    if (!loadedBaseline || !loadedBaseline.metrics || !loadedBaseline.metrics.length) {
+      return alert('Please load the baseline record first using Engagement ID.');
+    }
+    currentEngagementId = loadedBaseline.engagement_id;
+  }
+
+  renderMetricForms();
   showScreen(2);
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-function goBack(){showScreen(1);window.scrollTo({top:0,behavior:'smooth'});}
+function renderMetricForms() {
+  const container = document.getElementById('metric-form-container');
+  container.innerHTML = '';
 
-function buildBaseline() {
-  const container=document.getElementById('baseline-sections');
-  container.innerHTML='';
-  const qKey=surveyType;
-  const tagClass=surveyType==='baseline'?'tag-baseline':'tag-endline';
-  const tagLabel=surveyType==='baseline'?'Baseline':'Endline';
-  for(const[key,data]of Object.entries(questions)){
-    if(!selected[key].size)continue;
-    const sec=document.createElement('div');
-    sec.className='baseline-section';
-    const qs=data[qKey];
-    let html=`<div class="baseline-section-header">
-      <div class="roi-icon icon-${key}" style="width:32px;height:32px;font-size:15px;flex-shrink:0;">${data.icon}</div>
-      <span class="baseline-section-title">${data.title}</span>
-      <span class="survey-type-tag ${tagClass}">${tagLabel}</span>
-    </div>`;
-    for(const q of qs){
-      html+=`<div class="baseline-q"><div class="baseline-q-label">${q.label}`;
-      if(q.type==='rating')html+=`<span>1 = not at all · 5 = very much</span>`;
-      html+=`</div>`;
-      if(q.type==='rating'){
-        html+=`<div class="rating-row">`;
-        for(let i=1;i<=5;i++)html+=`<button class="rating-btn" data-id="${q.id}" data-val="${i}" onclick="selectRating(this)">${i}</button>`;
-        html+=`</div><div class="rating-labels"><span>Not at all</span><span>Very much</span></div>`;
-      }else if(q.type==='select'){
-        html+=`<select class="base-select" id="${q.id}"><option value="">Select one...</option>`;
-        for(const o of q.options)html+=`<option value="${o}">${o}</option>`;
-        html+=`</select>`;
-      }else{
-        html+=`<textarea class="base-textarea" id="${q.id}" placeholder="Type your answer here..."></textarea>`;
-      }
-      html+=`</div>`;
+  document.getElementById('metric-screen-title').innerHTML = surveyType === 'baseline'
+    ? 'Fill metric-wise <em>baseline</em> data'
+    : 'Fill metric-wise <em>endline</em> data';
+
+  document.getElementById('metric-screen-sub').textContent = surveyType === 'baseline'
+    ? 'For each selected metric, enter the current value and the evidence/source.'
+    : 'Baseline values are shown as read-only. Enter current value, what changed, evidence, and Goalkeep attribution.';
+
+  const metrics = surveyType === 'baseline'
+    ? Array.from(selectedMetricIds).map(metricById)
+    : loadedBaseline.metrics;
+
+  metrics.forEach(item => {
+    const config = surveyType === 'baseline' ? item : Object.assign({}, metricById(item.metric_id), item);
+    const key = areaKey(config.roi_area);
+    const card = document.createElement('div');
+    card.className = 'metric-card';
+    card.dataset.metricId = config.metric_id;
+
+    if (surveyType === 'baseline') {
+      card.innerHTML = `
+        <div class="metric-top">
+          <div class="roi-icon icon-${key}">${ROI_GROUPS[config.roi_area].icon}</div>
+          <div class="metric-main">
+            <div class="metric-title">${config.metric_evidence}</div>
+            <div class="metric-meta">${config.roi_area} · Unit: ${config.unit || 'Not defined'}</div>
+          </div>
+        </div>
+        <div class="metric-how"><strong>How to collect:</strong> ${config.how_to_collect}</div>
+        <div class="baseline-q">
+          <div class="input-label">Baseline question</div>
+          <p style="font-size:14px;margin:6px 0 10px;">${config.baseline_question}</p>
+        </div>
+        <div class="metric-grid">
+          <div class="field-wrap">
+            <label>Baseline value with unit</label>
+            <input id="value_text_${config.metric_id}" placeholder="e.g. 80 requests/month" />
+          </div>
+          <div class="field-wrap">
+            <label>Numeric value</label>
+            <input id="numeric_value_${config.metric_id}" type="number" step="any" placeholder="e.g. 80" />
+          </div>
+          <div class="field-wrap field-full">
+            <label>Evidence / source / assumption</label>
+            <textarea id="evidence_${config.metric_id}" placeholder="e.g. Based on monthly MEL request log or client estimate"></textarea>
+          </div>
+          <div class="field-wrap">
+            <label>Is this exact or estimated?</label>
+            <select id="assumption_type_${config.metric_id}">
+              <option value="">Select...</option>
+              <option value="Exact">Exact</option>
+              <option value="Estimated">Estimated</option>
+              <option value="Not sure">Not sure</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <label>₹ value per unit, if known</label>
+            <input id="value_per_unit_${config.metric_id}" type="number" step="any" placeholder="Optional" value="${config.value_per_unit_default || ''}" />
+          </div>
+        </div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="metric-top">
+          <div class="roi-icon icon-${key}">${ROI_GROUPS[config.roi_area].icon}</div>
+          <div class="metric-main">
+            <div class="metric-title">${config.metric_evidence}</div>
+            <div class="metric-meta">${config.roi_area} · Unit: ${config.unit || 'Not defined'}</div>
+          </div>
+        </div>
+        <div class="metric-how"><strong>How to collect:</strong> ${config.how_to_collect}</div>
+        <div class="baseline-box">
+          <strong>Baseline answer</strong>
+          Value: ${config.baseline_value_text || '-'}<br>
+          Numeric value: ${config.baseline_numeric || '-'}<br>
+          Evidence/source: ${config.baseline_evidence || '-'}
+        </div>
+        <div class="baseline-q">
+          <div class="input-label">Endline question</div>
+          <p style="font-size:14px;margin:6px 0 10px;">${config.endline_question}</p>
+        </div>
+        <div class="metric-grid">
+          <div class="field-wrap">
+            <label>Endline/current value with unit</label>
+            <input id="value_text_${config.metric_id}" placeholder="e.g. 10 requests/month" />
+          </div>
+          <div class="field-wrap">
+            <label>Numeric value</label>
+            <input id="numeric_value_${config.metric_id}" type="number" step="any" placeholder="e.g. 10" />
+          </div>
+          <div class="field-wrap field-full">
+            <label>What changed?</label>
+            <textarea id="what_changed_${config.metric_id}" placeholder="Describe the shift from baseline to now"></textarea>
+          </div>
+          <div class="field-wrap field-full">
+            <label>Evidence / source</label>
+            <textarea id="evidence_${config.metric_id}" placeholder="e.g. dashboard usage, request logs, client example, report/deck reference"></textarea>
+          </div>
+          <div class="field-wrap">
+            <label>Goalkeep attribution</label>
+            <select id="attribution_level_${config.metric_id}">
+              <option value="">Select...</option>
+              <option value="Low contribution">Low contribution — 25%</option>
+              <option value="Medium contribution">Medium contribution — 50%</option>
+              <option value="High contribution">High contribution — 75%</option>
+              <option value="Very high contribution">Very high contribution — 100%</option>
+            </select>
+            <div class="attr-help">This estimates how much of the change can reasonably be linked to Goalkeep.</div>
+          </div>
+          <div class="field-wrap">
+            <label>Can this example be used externally?</label>
+            <select id="can_use_quote_${config.metric_id}">
+              <option value="">Select...</option>
+              <option value="Yes, with name">Yes, with organisation name</option>
+              <option value="Yes, anonymously">Yes, anonymously</option>
+              <option value="Internal use only">Internal use only</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="field-wrap field-full">
+            <label>Why this attribution level?</label>
+            <textarea id="attribution_reason_${config.metric_id}" placeholder="Briefly explain why this change can be linked to Goalkeep"></textarea>
+          </div>
+          <div class="field-wrap field-full">
+            <label>Quote or example</label>
+            <textarea id="quote_or_example_${config.metric_id}" placeholder="Optional quote, story, meeting, report, or decision example"></textarea>
+          </div>
+          <div class="field-wrap">
+            <label>₹ value per unit, if known</label>
+            <input id="value_per_unit_${config.metric_id}" type="number" step="any" placeholder="Optional" value="${config.value_per_unit || config.value_per_unit_default || ''}" />
+          </div>
+        </div>
+      `;
     }
-    sec.innerHTML=html;
-    container.appendChild(sec);
-  }
+
+    container.appendChild(card);
+  });
 }
 
-function selectRating(btn){
-  document.querySelectorAll(`.rating-btn[data-id="${btn.dataset.id}"]`).forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
+function collectMetricAnswers() {
+  const cards = Array.from(document.querySelectorAll('.metric-card'));
+  return cards.map(card => {
+    const metricId = card.dataset.metricId;
+    const answer = {
+      metric_id: metricId,
+      value_text: document.getElementById('value_text_' + metricId)?.value || '',
+      numeric_value: document.getElementById('numeric_value_' + metricId)?.value || '',
+      evidence: document.getElementById('evidence_' + metricId)?.value || '',
+      value_per_unit: document.getElementById('value_per_unit_' + metricId)?.value || ''
+    };
 
-function collectBaseline(){
-  const data={};
-  for(const[key,sec]of Object.entries(questions)){
-    if(!selected[key].size)continue;
-    for(const q of sec[surveyType]){
-      if(q.type==='rating'){
-        const s=document.querySelector(`.rating-btn[data-id="${q.id}"].sel`);
-        data[q.id]=s?s.dataset.val:'';
-      }else{
-        const el=document.getElementById(q.id);
-        data[q.id]=el?el.value:'';
-      }
+    if (surveyType === 'baseline') {
+      answer.assumption_type = document.getElementById('assumption_type_' + metricId)?.value || '';
     }
-  }
-  return data;
+
+    if (surveyType === 'endline') {
+      const attrLevel = document.getElementById('attribution_level_' + metricId)?.value || '';
+      answer.what_changed = document.getElementById('what_changed_' + metricId)?.value || '';
+      answer.attribution_level = attrLevel;
+      answer.attribution_percent = ATTRIBUTION[attrLevel] || '';
+      answer.attribution_reason = document.getElementById('attribution_reason_' + metricId)?.value || '';
+      answer.can_use_quote = document.getElementById('can_use_quote_' + metricId)?.value || '';
+      answer.quote_or_example = document.getElementById('quote_or_example_' + metricId)?.value || '';
+    }
+
+    return answer;
+  });
 }
 
-function handleSubmit(){
-  const org=document.getElementById('org-name').value.trim()||'Unknown org';
-  const date=document.getElementById('eng-date').value||'';
-  const contact=document.getElementById('contact-name').value.trim()||'';
-  const payload={
-    organisation:org,date,contact,survey_type:surveyType,
-    financial:Array.from(selected.financial),
-    efficiency:Array.from(selected.efficiency),
-    decision:Array.from(selected.decision),
-    capacity:Array.from(selected.capacity),
-    all:Object.values(selected).flatMap(s=>Array.from(s)),
-    baseline:collectBaseline()
+async function handleSubmit() {
+  if (!SHEET_URL || SHEET_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    alert('Please paste your Apps Script Web App URL in SHEET_URL first.');
+    return;
+  }
+
+  const org = document.getElementById('org-name').value.trim();
+  const date = document.getElementById('eng-date').value;
+  const contact = document.getElementById('contact-name').value.trim();
+
+  const metricAnswers = collectMetricAnswers();
+  if (!metricAnswers.length) return alert('No metric answers found.');
+
+  const payload = {
+    engagement_id: currentEngagementId,
+    survey_type: surveyType,
+    organisation: org,
+    date: date,
+    contact: contact,
+    metric_answers: metricAnswers
   };
-  if(SHEET_URL&&SHEET_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
-    fetch(SHEET_URL,{method:'POST',body:JSON.stringify(payload)}).catch(()=>{});
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const label = surveyType === 'baseline' ? 'Baseline' : 'Endline';
+    document.getElementById('conf-msg').textContent = `${label} data has been submitted for ${org || 'this engagement'}.`;
+
+    if (surveyType === 'baseline') {
+      document.getElementById('engagement-id-output').innerHTML = `
+        <div class="engagement-id-box">
+          Save this Engagement ID. It will be needed during Endline.
+          <span class="engagement-id">${currentEngagementId}</span>
+        </div>
+      `;
+    } else {
+      document.getElementById('engagement-id-output').innerHTML = `
+        <div class="engagement-id-box">
+          Endline was submitted against Engagement ID:
+          <span class="engagement-id">${currentEngagementId}</span>
+        </div>
+      `;
+    }
+
+    showScreen(3);
+    window.scrollTo({ top:0, behavior:'smooth' });
+  } catch (err) {
+    alert('Submission failed. Please check the Apps Script URL/deployment and try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit';
   }
-  const typeLabel=surveyType==='baseline'?'Baseline':'Endline';
-  document.getElementById('conf-msg').textContent=`${typeLabel} responses recorded for ${org}${date?' · '+date:''}. The Goalkeep team will use these to ${surveyType==='baseline'?'set up baseline tracking.':'calculate ROI and review what changed.'}`;
-  showScreen(3);
-  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function showScreen(n){
-  document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n-1));
-  for(let i=1;i<=3;i++){
-    document.getElementById('sn'+i).className='step-num'+(i<n?' done':i===n?' active':'');
-    document.getElementById('sl'+i).className='step-label'+(i===n?' active':'');
+function loadBaseline() {
+  if (!SHEET_URL || SHEET_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    alert('Please paste your Apps Script Web App URL in SHEET_URL first.');
+    return;
+  }
+
+  const engagementId = document.getElementById('lookup-engagement-id').value.trim();
+  if (!engagementId) return alert('Please enter Engagement ID.');
+
+  const msg = document.getElementById('baseline-load-msg');
+  msg.innerHTML = '<div class="notice">Loading baseline...</div>';
+
+  jsonp(`${SHEET_URL}?action=getBaseline&engagement_id=${encodeURIComponent(engagementId)}`)
+    .then(data => {
+      if (data.status !== 'success') throw new Error(data.message || 'Could not load baseline.');
+      if (!data.metrics || !data.metrics.length) throw new Error('No baseline metric records found for this Engagement ID.');
+
+      loadedBaseline = data;
+      currentEngagementId = data.engagement_id;
+
+      if (data.engagement) {
+        document.getElementById('org-name').value = data.engagement.organisation || document.getElementById('org-name').value;
+        const dateVal = String(data.engagement.engagement_date || '').slice(0,10);
+        if (dateVal) document.getElementById('eng-date').value = dateVal;
+        document.getElementById('contact-name').value = data.engagement.contact_name || document.getElementById('contact-name').value;
+      }
+
+      msg.innerHTML = `<div class="notice success">Baseline loaded: ${data.metrics.length} metric(s) found.</div>`;
+      document.getElementById('loaded-summary').classList.add('visible');
+      document.getElementById('loaded-chips').innerHTML = data.metrics.map(m => `<span class="chip chip-${areaKey(m.roi_area)}">${m.metric_evidence}</span>`).join('');
+    })
+    .catch(err => {
+      loadedBaseline = null;
+      msg.innerHTML = `<div class="notice error">${err.message}</div>`;
+      document.getElementById('loaded-summary').classList.remove('visible');
+    });
+}
+
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'gk_jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    const separator = url.includes('?') ? '&' : '?';
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Request timed out.'));
+    }, 15000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[callbackName] = data => {
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error('Could not connect to Apps Script.'));
+    };
+
+    script.src = `${url}${separator}callback=${callbackName}`;
+    document.body.appendChild(script);
+  });
+}
+
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach((s, i) => s.classList.toggle('active', i === n - 1));
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('sn' + i).className = 'step-num' + (i < n ? ' done' : i === n ? ' active' : '');
+    document.getElementById('sl' + i).className = 'step-label' + (i === n ? ' active' : '');
   }
 }
 
-function resetAll(){
-  for(const key of Object.keys(selected)){
-    selected[key].clear();
-    document.querySelectorAll('#opts-'+key+' .opt').forEach(el=>el.className='opt');
-    document.getElementById('badge-'+key).classList.remove('visible');
-    if(openSec[key])toggleSection(key);
-  }
-  document.getElementById('summary').classList.remove('visible');
-  document.getElementById('org-name').value='';
-  document.getElementById('eng-date').valueAsDate=new Date();
-  document.getElementById('contact-name').value='';
+function resetAll() {
+  selectedMetricIds = new Set();
+  loadedBaseline = null;
+  currentEngagementId = '';
+  document.getElementById('org-name').value = '';
+  document.getElementById('eng-date').valueAsDate = new Date();
+  document.getElementById('contact-name').value = '';
+  document.getElementById('lookup-engagement-id').value = '';
+  document.getElementById('baseline-load-msg').innerHTML = '';
+  document.getElementById('engagement-id-output').innerHTML = '';
+  document.getElementById('loaded-summary').classList.remove('visible');
   setSurveyType('baseline');
+  renderMetricSelection();
+  updateSummary();
   showScreen(1);
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
-
-document.getElementById('eng-date').valueAsDate=new Date();
 </script>
 </body>
 </html>
