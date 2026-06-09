@@ -880,7 +880,10 @@ function loadBaseline() {
   const msg = document.getElementById('baseline-load-msg');
   msg.innerHTML = '<div class="notice">Loading baseline...</div>';
 
-  jsonp(`${SHEET_URL}?action=getBaseline&engagement_id=${encodeURIComponent(engagementId)}`)
+  jsonp(SHEET_URL, {
+    action: 'getBaseline',
+    engagement_id: engagementId
+  })
     .then(data => {
       if (data.status !== 'success') throw new Error(data.message || 'Could not load baseline.');
       if (!data.metrics || !data.metrics.length) throw new Error('No baseline metric records found for this Engagement ID.');
@@ -906,21 +909,39 @@ function loadBaseline() {
     });
 }
 
-function jsonp(url) {
+function jsonp(baseUrl, params = {}) {
   return new Promise((resolve, reject) => {
     const callbackName = 'gk_jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-    const separator = url.includes('?') ? '&' : '?';
+    let url;
+
+    try {
+      url = new URL(baseUrl);
+    } catch (err) {
+      reject(new Error('Invalid Apps Script URL. Please check SHEET_URL.'));
+      return;
+    }
+
+    Object.keys(params || {}).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        url.searchParams.set(key, params[key]);
+      }
+    });
+
+    url.searchParams.set('callback', callbackName);
+    url.searchParams.set('_', Date.now());
+
     const script = document.createElement('script');
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('Request timed out.'));
-    }, 15000);
 
     function cleanup() {
       clearTimeout(timeout);
       delete window[callbackName];
       if (script.parentNode) script.parentNode.removeChild(script);
     }
+
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Request timed out. Please check the Apps Script deployment URL and access settings.'));
+    }, 20000);
 
     window[callbackName] = data => {
       cleanup();
@@ -929,10 +950,10 @@ function jsonp(url) {
 
     script.onerror = () => {
       cleanup();
-      reject(new Error('Could not connect to Apps Script.'));
+      reject(new Error('Could not connect to Apps Script. Please check deployment access and URL.'));
     };
 
-    script.src = `${url}${separator}callback=${callbackName}`;
+    script.src = url.toString();
     document.body.appendChild(script);
   });
 }
